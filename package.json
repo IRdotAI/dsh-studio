@@ -1,0 +1,58 @@
+{
+  "name": "dsh-studio",
+  "description": "Themes and personalisation for DeepSeek Harness: 17 themes and a theme editor, liquid-glass panels, wallpapers, fonts, your own app name/logo/greeting, saved prompts, a Ctrl+K quick switcher, and optional custom instructions for the AI",
+  "version": "1.1.0",
+  "private": true,
+  "author": "RdotA",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IRdotAI/dsh-studio.git"
+  },
+  "homepage": "https://github.com/IRdotAI/dsh-studio#readme",
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "themes",
+    "personalisation",
+    "liquid-glass"
+  ],
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./shared": "./lib/shared.js",
+    "./client": "./lib/client.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib/index.js",
+    "lib/shared.js",
+    "lib/client.js",
+    "cordis.patch.yml"
+  ],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node test/selftest.mjs"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": [
+        "./cordis.patch.yml"
+      ]
+    },
+    "client": {
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-layout",
+        "@deepseek-ai/dsh-client-ui-sidebar",
+        "@deepseek-ai/dsh-client-ui-theme"
+      ],
+      "platform": "web"
+    }
+  },
+  "engines": {
+    "node": ">=22.5"
+  }
+}

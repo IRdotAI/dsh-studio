@@ -1,0 +1,4 @@
+# dsh-studio bundle: one host plugin row (its browser half ships in the same package).
+- insert:
+    - id: studio
+      name: dsh-studio
