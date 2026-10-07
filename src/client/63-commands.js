@@ -1,7 +1,25 @@
 //#region slash commands
+/**
+ * True when the harness itself has a /name command in this session. DSH empties
+ * the whole "/" menu when a plugin command shares a host command's name, so
+ * Studio steps aside instead (the host catalog is loaded before this is asked).
+ */
+function hostHasCommand(commands, session, name) {
+	try {
+		return commands.directory?.entries?.get(session?.sessionId)?.commands?.some((c) => c.name === name) === true;
+	} catch {
+		return false;
+	}
+}
+
 function registerCommands(scope) {
 	const commands = scope.commandUi;
-	scope.effect(() => commands.register({
+	const register = (spec, label) => scope.effect(() => commands.register({
+		...spec,
+		available: (session) => !hostHasCommand(commands, session, spec.name) && spec.available(session),
+	}), label);
+
+	register({
 		name: "theme",
 		label: () => t("command.theme"),
 		description: () => t("command.themeDescription"),
@@ -26,9 +44,9 @@ function registerCommands(scope) {
 				else applyTheme(option.id);
 			},
 		},
-	}), "dsh-studio: /theme");
+	}, "dsh-studio: /theme");
 
-	scope.effect(() => commands.register({
+	register({
 		name: "prompts",
 		label: () => t("composer.title"),
 		description: () => t("command.promptsDescription"),
@@ -47,24 +65,60 @@ function registerCommands(scope) {
 				if (prompt) setTimeout(() => void insertPrompt(prompt, session?.sessionId), 0);
 			},
 		},
-	}), "dsh-studio: /prompts");
+	}, "dsh-studio: /prompts");
 
-	scope.effect(() => commands.register({
+	register({
 		name: "studio",
 		label: () => "Studio",
 		description: () => t("command.studioDescription"),
 		icon: PaletteIcon,
 		available: () => true,
 		ui: { kind: "action", run: () => openStudio() },
-	}), "dsh-studio: /studio");
+	}, "dsh-studio: /studio");
 
-	scope.effect(() => commands.register({
+	register({
+		name: "ai",
+		label: () => t("command.mode"),
+		description: () => t("command.modeDescription"),
+		icon: SparkIcon,
+		available: () => true,
+		ui: {
+			kind: "popupSelect",
+			searchMode: "fuzzy-label",
+			searchLabels: () => ({ placeholder: t("command.modeSearch"), empty: t("command.modeEmpty"), noResults: t("command.modeNoResults") }),
+			options: async () => [
+				...snapshot.state.persona.modes.map((m) => ({
+					id: m.id, label: `${m.emoji}  ${modeName(m)}`, detail: m.instructions.slice(0, 120),
+					active: snapshot.state.persona.enabled && snapshot.state.persona.mode === m.id,
+				})),
+				{ id: "__off", label: "⏻  " + t("command.modeOff"), detail: t("command.modeOffDetail"), active: !snapshot.state.persona.enabled },
+			],
+			onSelect: (option) => {
+				if (option.id === "__off") modesOff();
+				else {
+					const mode = snapshot.state.persona.modes.find((m) => m.id === option.id);
+					if (mode) applyMode(mode);
+				}
+			},
+		},
+	}, "dsh-studio: /ai");
+
+	register({
+		name: "transcript",
+		label: () => t("command.export"),
+		description: () => t("command.exportDescription"),
+		icon: PaletteIcon,
+		available: () => true,
+		ui: { kind: "action", run: (session) => setSnap({ exportFor: session?.sessionId ?? currentSessionId() }) },
+	}, "dsh-studio: /transcript");
+
+	register({
 		name: "focus",
 		label: () => t("command.focus"),
 		description: () => t("command.focusDescription"),
 		icon: PaletteIcon,
 		available: () => Boolean(services.layout),
 		ui: { kind: "action", run: () => toggleFocus() },
-	}), "dsh-studio: /focus");
+	}, "dsh-studio: /focus");
 }
 //#endregion

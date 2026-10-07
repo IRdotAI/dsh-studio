@@ -72,7 +72,7 @@ function UpdatesTab() {
 			blocked ? h("p", { className: "st_creditLine" }, blocked) : null,
 			h(Toggle, { checked: auto && !u.blocker, disabled: Boolean(u.blocker), onChange: setAutoUpdates, label: t("updates.auto"), hint: u.blocker ? t("updates.autoUnavailable") : t("updates.autoHint") }),
 			h("span", { className: "st_hint" },
-				u.error ? u.error : u.updateAvailable ? t("updates.available", { version: u.latest }) : u.releases.length ? t("updates.upToDate") : t("updates.noReleases"),
+				u.error ? hostText(u.error) : u.updateAvailable ? t("updates.available", { version: u.latest }) : u.releases.length ? t("updates.upToDate") : t("updates.noReleases"),
 				" ", t("updates.lastChecked", { when: sinceText(u.lastCheck) })),
 		),
 		h(Section, { key: "versions", title: t("updates.allVersions"), description: t("updates.allVersionsDescription") },

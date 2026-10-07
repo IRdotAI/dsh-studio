@@ -18,7 +18,7 @@ function apply(ctx) {
 			applyCss();
 			scheduleTick();
 		});
-		const timer = setInterval(applyCss, 5 * 60 * 1000); // keeps the greeting's time of day current
+		const timer = setInterval(applyCss, 60 * 1000); // keeps the greeting's time of day and the slideshow current
 		return () => {
 			off();
 			clearInterval(timer);
@@ -30,10 +30,36 @@ function apply(ctx) {
 	}, "dsh-studio: live theme");
 
 	ctx.effect(() => {
+		const budget = setInterval(checkBudget, 5 * 60 * 1000);
+		const first = setTimeout(checkBudget, 5000);
+		return () => { clearInterval(budget); clearTimeout(first); };
+	}, "dsh-studio: spending alerts");
+
+	ctx.effect(() => {
+		const onVisible = () => syncVideo();
+		document.addEventListener("visibilitychange", onVisible);
+		let off = () => {};
+		try {
+			for (const query of ["(prefers-reduced-transparency: reduce)", "(prefers-reduced-motion: reduce)"]) {
+				const mq = window.matchMedia(query);
+				mq.addEventListener("change", applyCss);
+				const prev = off;
+				off = () => { prev(); mq.removeEventListener("change", applyCss); };
+			}
+		} catch { /* no media queries */ }
+		return () => {
+			document.removeEventListener("visibilitychange", onVisible);
+			off();
+			videoEl?.remove();
+			videoEl = null;
+		};
+	}, "dsh-studio: video wallpaper & system preferences");
+
+	ctx.effect(() => {
 		const schedule = setInterval(scheduleTick, 30 * 1000);
 		// Windows accent colour and desktop wallpaper can change while the app is open.
 		const env = setInterval(() => {
-			if (snapshot.state.followWindows.accent || snapshot.state.wallpaper.src === DESKTOP_WALLPAPER) void refreshEnv();
+			if (snapshot.state.followWindows.accent || WALLPAPER_SOURCES.includes(snapshot.state.wallpaper.src)) void refreshEnv();
 		}, 2 * 60 * 1000);
 		const onVisible = () => {
 			if (document.hidden) return;
@@ -117,6 +143,21 @@ function apply(ctx) {
 				services.uiSession = null;
 			};
 		}, "dsh-studio: task alerts");
+	});
+	ctx.inject(["uiWorkspace"], (scope) => {
+		services.uiWorkspace = scope.uiWorkspace;
+		scope.effect(() => {
+			const off = watchWorkspace();
+			return () => {
+				off();
+				services.uiWorkspace = null;
+				setSnap({ workspace: { id: "", title: "", list: [] } });
+			};
+		}, "dsh-studio: workspace themes");
+	});
+	ctx.inject(["sessions"], (scope) => {
+		services.sessions = scope.sessions;
+		scope.effect(() => () => { services.sessions = null; }, "dsh-studio: session titles");
 	});
 	ctx.inject(["commandUi"], registerCommands);
 }

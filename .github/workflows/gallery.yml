@@ -2,10 +2,10 @@ name: Gallery
 
 on:
   pull_request:
-    paths: ["gallery/themes/**"]
+    paths: ["gallery/themes/**", "gallery/prompts/**"]
   push:
     branches: [main]
-    paths: ["gallery/themes/**"]
+    paths: ["gallery/themes/**", "gallery/prompts/**"]
 
 permissions:
   contents: write

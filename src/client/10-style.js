@@ -14,6 +14,18 @@ function ensureStyleEl() {
 	return styleEl;
 }
 
+/** Whether Windows / the browser asks for less transparency ("Transparency effects" off). */
+const systemReducesTransparency = () => {
+	try { return window.matchMedia?.("(prefers-reduced-transparency: reduce)").matches === true; } catch { return false; }
+};
+
+/** The settings as currently shown: with the open workspace's own theme or look applied. */
+function effectiveState() {
+	const s = snapshot.state;
+	const target = workspaceTarget(s, snapshot.workspace.id || s.cache.workspace);
+	return target ? applyTargetToState(s, target) : s;
+}
+
 function applyCss() {
 	// Until settings load, the host's first-paint sheet is already correct — leave it alone.
 	if (!snapshot.loaded || typeof document === "undefined") return;
@@ -23,15 +35,101 @@ function applyCss() {
 			fontFaces: snapshot.env.fontFaces,
 			windowsAccent: snapshot.env.windowsAccent,
 			greetingLang: greetingLang(),
+			workspace: snapshot.workspace.id || undefined,
+			slide: slideIndex(snapshot.env.wallpaperCount ?? 0, snapshot.state.wallpaper.interval),
+			reduceTransparency: systemReducesTransparency(),
 			...(snapshot.preview ? { previewTheme: snapshot.preview.theme } : {}),
 		});
 	} catch (e) {
 		console.warn("dsh-studio: stylesheet build failed", e);
 		return;
 	}
+	syncVideo();
 	if (css === lastCss && styleEl?.isConnected) return;
 	lastCss = css;
 	ensureStyleEl().textContent = css;
+}
+//#endregion
+
+//#region video wallpaper
+let videoEl = null;
+
+/** Keep the looping video wallpaper element in step with the settings (paused while hidden or for reduced motion). */
+function syncVideo() {
+	const wall = effectiveState().wallpaper;
+	const st = snapshot.state.style;
+	const want = wall.src === "video" && wall.video && !st.reduceTransparency && !systemReducesTransparency();
+	if (!want) {
+		videoEl?.remove();
+		videoEl = null;
+		return;
+	}
+	const src = /^https?:/i.test(wall.video) ? wall.video : `${VIDEO_WALLPAPER_URL}?v=${encodeURIComponent(wall.video)}`;
+	if (!videoEl?.isConnected) {
+		videoEl = document.createElement("video");
+		videoEl.id = "studio-wall-video";
+		videoEl.muted = true;
+		videoEl.loop = true;
+		videoEl.playsInline = true;
+		videoEl.setAttribute("aria-hidden", "true");
+		videoEl.setAttribute("tabindex", "-1");
+		document.body.prepend(videoEl);
+	}
+	if (videoEl.dataset.src !== src) {
+		videoEl.dataset.src = src;
+		videoEl.src = src;
+	}
+	let still = false;
+	try { still = window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch { /* no media queries */ }
+	if (document.hidden || still) videoEl.pause();
+	else void videoEl.play().catch(() => { /* autoplay refused; shows the first frame */ });
+}
+//#endregion
+
+//#region open workspace
+/** The workspace of the chat in the main view, and every workspace, from the harness's workspace service. */
+function readWorkspace() {
+	const ui = services.uiWorkspace;
+	if (!ui) return { id: "", title: "", list: [] };
+	let items = [];
+	let sessionId;
+	try { items = ui.workspaces?.list?.getSnapshot?.()?.items ?? []; } catch { /* not ready */ }
+	try { sessionId = ui.selection?.getSnapshot?.()?.sessionId; } catch { /* not ready */ }
+	const titleOf = (w) => w.title || String(w.path ?? "").split(/[\\/]/).filter(Boolean).pop() || w.workspaceId;
+	const open = sessionId ? items.find((w) => w.sessionIds?.includes(sessionId)) : undefined;
+	return {
+		id: open?.workspaceId ?? "",
+		title: open ? titleOf(open) : "",
+		list: items.map((w) => ({ id: w.workspaceId, title: titleOf(w) })),
+	};
+}
+
+/** A workspace's name as the sidebar shows it: DSH's own "default-workspace" is translated. */
+const workspaceLabel = (title) => (title === "default-workspace" ? t("workspaces.default") : title);
+
+/** Follow workspace switches; remember the open one so the host's first paint matches. */
+function watchWorkspace() {
+	const ui = services.uiWorkspace;
+	const persist = () => {
+		const id = snapshot.workspace.id;
+		if (snapshot.loaded && id && id !== snapshot.state.cache.workspace) update({ cache: { workspace: id } });
+	};
+	const refresh = () => {
+		const next = readWorkspace();
+		const cur = snapshot.workspace;
+		const same = next.id === cur.id && next.title === cur.title && next.list.length === cur.list.length && next.list.every((w, i) => w.id === cur.list[i]?.id && w.title === cur.list[i]?.title);
+		if (!same) setSnap({ workspace: next });
+		persist();
+	};
+	refresh();
+	const offs = [];
+	try { offs.push(ui.selection.subscribe(refresh)); } catch { /* no selection store */ }
+	try { offs.push(ui.workspaces.list.subscribe(refresh)); } catch { /* no list store */ }
+	const offLoad = subscribe(persist);
+	return () => {
+		for (const off of offs) { try { off?.(); } catch { /* already gone */ } }
+		offLoad();
+	};
 }
 //#endregion
 

@@ -23,34 +23,93 @@ function LooksSection({ state }) {
 			: h("p", { className: "st_hint" }, t("looks.empty")));
 }
 
+/** Parse "51.5, -0.12" into a location, or null. */
+function parseLocation(text) {
+	const m = /^\s*(-?\d+(?:\.\d+)?)\s*[,;\s]\s*(-?\d+(?:\.\d+)?)\s*$/.exec(text);
+	if (!m) return null;
+	const lat = Number(m[1]);
+	const lon = Number(m[2]);
+	return Math.abs(lat) <= 90 && Math.abs(lon) <= 180 ? { lat, lon } : null;
+}
+
 function ScheduleSection({ state }) {
 	const sched = state.schedule;
+	const loc = sched.location;
 	const targets = scheduleTargets(state);
 	const setEntries = (entries) => update({ schedule: { entries, applied: "" } });
+	const setEntry = (i, patch) => setEntries(sched.entries.map((x, j) => (j === i ? { ...x, ...patch } : x)));
 	const addEntry = () => {
 		const used = new Set(sched.entries.map((e) => e.time));
-		const time = ["07:00", "19:00", "12:00", "22:00"].find((x) => !used.has(x)) ?? "09:00";
+		const time = ["sunrise", "sunset", "07:00", "19:00", "12:00", "22:00"].find((x) => !used.has(x)) ?? "09:00";
 		setEntries([...sched.entries, { time, target: targets[0]?.id ?? "theme:default" }]);
+	};
+	const kinds = [{ id: "time", label: t("schedule.atTime") }, { id: "sunrise", label: "🌅 " + t("schedule.sunrise") }, { id: "sunset", label: "🌇 " + t("schedule.sunset") }];
+	const usesSun = sched.entries.some((e) => e.time === "sunrise" || e.time === "sunset");
+	const sun = loc.lat != null ? sunTimes(new Date(), loc.lat, loc.lon) : null;
+	const clock = (d) => d.toLocaleTimeString(snapshot.lang, { hour: "2-digit", minute: "2-digit" });
+	const setLocation = (location) => update({ schedule: { location, applied: "" } });
+	const locate = () => {
+		if (!navigator.geolocation) return toast(t("schedule.locateFailed"));
+		navigator.geolocation.getCurrentPosition(
+			(pos) => { setLocation({ lat: pos.coords.latitude, lon: pos.coords.longitude }); toast(t("schedule.located")); },
+			() => toast(t("schedule.locateFailed")),
+			{ maximumAge: 3_600_000, timeout: 15_000 },
+		);
 	};
 	return h(Section, { title: t("schedule.title"), description: t("schedule.description") },
 		h(Toggle, { checked: sched.enabled, onChange: (v) => update({ schedule: { enabled: v, applied: "" } }), label: t("schedule.enable"), hint: t("schedule.hint") }),
-		sched.entries.map((entry, i) => h("div", { key: i, className: "st_schedRow" },
-			h("span", { className: "st_label" }, t("schedule.from")),
-			h("input", { type: "time", className: "st_input", value: entry.time, "aria-label": t("schedule.time"), onChange: (e) => { if (e.target.value) setEntries(sched.entries.map((x, j) => (j === i ? { ...x, time: e.target.value } : x))); } }),
-			h("span", { className: "st_label" }, t("schedule.use")),
-			h(Select, { value: entry.target, options: targets, onChange: (v) => setEntries(sched.entries.map((x, j) => (j === i ? { ...x, target: v } : x))) }),
-			h(Button, { small: true, kind: "danger", "aria-label": t("common.delete"), onClick: () => setEntries(sched.entries.filter((_, j) => j !== i)) }, "×"))),
-		h("div", { className: "st_actions" }, h(Button, { onClick: addEntry }, t("schedule.add"))));
+		sched.entries.map((entry, i) => {
+			const fixed = entry.time !== "sunrise" && entry.time !== "sunset";
+			return h("div", { key: i, className: "st_schedRow" },
+				h("span", { className: "st_label" }, t("schedule.from")),
+				h(Select, { value: fixed ? "time" : entry.time, options: kinds, onChange: (k) => setEntry(i, { time: k === "time" ? "07:00" : k }) }),
+				fixed ? h("input", { type: "time", className: "st_input", value: entry.time, "aria-label": t("schedule.time"), onChange: (e) => { if (e.target.value) setEntry(i, { time: e.target.value }); } }) : null,
+				h("span", { className: "st_label" }, t("schedule.use")),
+				h(Select, { value: entry.target, options: targets, onChange: (v) => setEntry(i, { target: v }) }),
+				h(Button, { small: true, kind: "danger", "aria-label": t("common.delete"), onClick: () => setEntries(sched.entries.filter((_, j) => j !== i)) }, "×"));
+		}),
+		h("div", { className: "st_actions" }, h(Button, { onClick: addEntry }, t("schedule.add"))),
+		usesSun || loc.lat != null
+			? h("div", { className: "st_schedLocation" },
+				h("span", { className: "st_hint", style: { flex: "1 1 260px" } },
+					loc.lat == null
+						? t("schedule.noLocation", { sunrise: SUN_FALLBACK.sunrise, sunset: SUN_FALLBACK.sunset })
+						: sun?.polar
+							? t("schedule.polar")
+							: t("schedule.locationSet", { lat: loc.lat, lon: loc.lon, sunrise: clock(sun.sunrise), sunset: clock(sun.sunset) })),
+				h(Button, { small: true, onClick: locate }, "📍 " + t("schedule.locate")),
+				h(TextInput, { value: loc.lat == null ? "" : `${loc.lat}, ${loc.lon}`, placeholder: t("schedule.latLon"), onCommit: (v) => { const p = parseLocation(v); if (p) setLocation(p); else if (!v.trim()) setLocation({ lat: null, lon: null }); } }))
+			: null);
+}
+
+/** Give each workspace its own theme or look, shown whenever it's open. */
+function WorkspaceSection({ state }) {
+	const ws = useSnap((s) => s.workspace);
+	const targets = [{ id: "", label: t("workspaces.normal") }, ...scheduleTargets(state)];
+	const set = (id, target) => update({ workspaceThemes: { [id]: target } }); // "" is dropped by the validator
+	return h(Section, { title: t("workspaces.title"), description: t("workspaces.description") },
+		ws.list.length
+			? ws.list.map((w) => h("div", { key: w.id, className: "st_wsRow" },
+				h("span", { className: "st_wsName", title: workspaceLabel(w.title) }, "📁 ", workspaceLabel(w.title)),
+				w.id === ws.id ? h("span", { className: "st_badge st_badge_accent" }, t("workspaces.open")) : null,
+				h(Select, { value: state.workspaceThemes[w.id] ?? "", options: targets, onChange: (v) => set(w.id, v) })))
+			: h("p", { className: "st_hint" }, t("workspaces.none")));
 }
 
 function ThemesTab() {
 	const state = useSnap((s) => s.state);
 	const themeSnap = useSnap((s) => s.themeSnap);
 	const env = useSnap((s) => s.env);
+	const workspace = useSnap((s) => s.workspace);
 	const choices = themeChoices(state);
 	const builtIn = choices.filter((c) => !c.custom);
 	const custom = choices.filter((c) => c.custom);
+	const wsTarget = workspaceTarget(state, workspace.id);
 	return [
+		wsTarget
+			? h("div", { key: "ws-note", className: "st_banner st_bannerInfo" },
+				t("workspaces.overrideNote", { workspace: workspaceLabel(workspace.title), name: scheduleTargets(state).find((x) => x.id === wsTarget)?.label ?? wsTarget }))
+			: null,
 		...LOOKS.map((look) => h("div", { key: "look:" + look.id, className: "st_look" },
 			h("span", { style: { fontSize: 28 }, "aria-hidden": true }, "🫧"),
 			h("div", { className: "st_lookText" },
@@ -99,6 +158,7 @@ function ThemesTab() {
 			: null,
 		h(LooksSection, { key: "looks", state }),
 		h(ScheduleSection, { key: "schedule", state }),
+		h(WorkspaceSection, { key: "workspaces", state }),
 	];
 }
 //#endregion

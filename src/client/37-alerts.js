@@ -83,6 +83,7 @@ function watchSessions(uiSession) {
 				const seconds = (Date.now() - (started.get(id) ?? Date.now())) / 1000;
 				started.delete(id);
 				if (!s.pending) alert_("done", id, seconds);
+				setTimeout(checkBudget, 2500); // the finished task's usage is recorded by now
 			}
 			if (s.pending && !before?.pending && snapshot.state.alerts.needsInput) alert_("input", id, 0);
 		}

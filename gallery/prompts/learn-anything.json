@@ -1,0 +1,34 @@
+{
+  "id": "learn-anything",
+  "name": "Learn anything",
+  "emoji": "🎓",
+  "author": "RdotA",
+  "description": "Explanations, quizzes and study plans for any topic.",
+  "prompts": [
+    {
+      "title": "Explain simply",
+      "text": "Explain {ask:Topic} as if I'm new to it: start with the big idea, then the key parts, then one everyday example.",
+      "folder": "Learning"
+    },
+    {
+      "title": "Quiz me",
+      "text": "Quiz me on {ask:Topic}. Ask one question at a time, wait for my answer, tell me if I'm right and why, then ask the next. Start easy and get harder.",
+      "folder": "Learning"
+    },
+    {
+      "title": "Study plan",
+      "text": "Make a {ask:How many weeks}-week study plan for learning {ask:Topic}, with goals, resources and a small project for each week.",
+      "folder": "Learning"
+    },
+    {
+      "title": "Compare two things",
+      "text": "Compare {ask:First thing} and {ask:Second thing}: what each is for, how they differ, and when to choose which. Finish with a short table.",
+      "folder": "Learning"
+    },
+    {
+      "title": "Analogy please",
+      "text": "Give me three different analogies that explain {ask:Concept}, and say where each one breaks down.",
+      "folder": "Learning"
+    }
+  ]
+}

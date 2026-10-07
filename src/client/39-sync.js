@@ -46,7 +46,7 @@ function SyncTab() {
 				]),
 		h(Section, { key: "backup", title: t("sync.backupTitle"), description: status.gistUrl ? undefined : t("sync.noBackupYet") },
 			status.gistUrl ? h("p", { className: "st_creditLine" }, t("sync.backupAt"), " ", h(ExternalLink, { href: status.gistUrl }, status.gistUrl.replace("https://", "")), ". ", t("sync.lastBackup", { when: sinceText(status.lastPush) })) : null,
-			status.error ? h("p", { className: "st_creditLine" }, status.error) : null,
+			status.error ? h("p", { className: "st_creditLine" }, hostText(status.error)) : null,
 			h("div", { className: "st_actions" },
 				h(Button, { kind: "primary", disabled: !status.hasToken || Boolean(busy), onClick: () => void act("push", {}, "sync.backedUp") }, busy === "push" ? t("sync.backingUp") : t("sync.backupNow")),
 				confirmRestore

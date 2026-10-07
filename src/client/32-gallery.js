@@ -25,6 +25,11 @@ function GalleryTab() {
 	};
 
 	const themes = gallery?.themes ?? [];
+	const packs = gallery?.packs ?? [];
+	const addPack = (pack) => {
+		const added = addPrompts(pack.prompts);
+		toast(added ? t("gallery.packAdded", { count: added, name: pack.name }) : t("gallery.packAlready"));
+	};
 	return [
 		h(Section, {
 			key: "gallery",
@@ -32,7 +37,7 @@ function GalleryTab() {
 			description: t("gallery.description"),
 			actions: h(Button, { disabled: loading, onClick: () => void load(true) }, loading ? t("common.loading") : t("common.refresh")),
 		},
-			gallery?.error ? h("p", { className: "st_creditLine" }, gallery.error) : null,
+			gallery?.error ? h("p", { className: "st_creditLine" }, hostText(gallery.error)) : null,
 			!gallery ? h("p", { className: "st_hint" }, t("common.loading")) : null,
 			gallery && !themes.length && !gallery.error ? h("p", { className: "st_hint" }, t("gallery.empty")) : null,
 			themes.length
@@ -46,6 +51,24 @@ function GalleryTab() {
 				}))
 				: null,
 		),
+		h(Section, { key: "packs", title: t("gallery.packsTitle"), description: t("gallery.packsDescription") },
+			packs.length
+				? h("div", { className: "st_packs" }, packs.map((pack) => {
+					const have = new Set(snapshot.state.prompts.map((p) => p.title + "\n" + p.text));
+					const owned = pack.prompts.every((p) => have.has(p.title + "\n" + p.text));
+					return h("div", { key: pack.id, className: "st_packCard" },
+						h("div", { className: "st_packHead" },
+							h("span", { className: "st_packEmoji", "aria-hidden": true }, pack.emoji),
+							h("div", { style: { flex: 1, minWidth: 0 } },
+								h("div", { className: "st_packName" }, pack.name),
+								h("div", { className: "st_cardAuthor", style: { padding: 0, margin: 0 } }, [pack.author ? t("gallery.by", { author: pack.author }) : "", t("gallery.packCount", { count: pack.prompts.length })].filter(Boolean).join(" · "))),
+							owned
+								? h("span", { className: "st_badge st_badge_ok" }, t("gallery.packAdded1"))
+								: h(Button, { small: true, kind: "primary", onClick: () => addPack(pack) }, t("gallery.packAdd"))),
+						pack.description ? h("p", { className: "st_hint", style: { margin: 0 } }, pack.description) : null,
+						h("ul", { className: "st_packList" }, pack.prompts.slice(0, 5).map((p, i) => h("li", { key: i }, p.title)), pack.prompts.length > 5 ? h("li", { key: "more", className: "st_hint" }, t("gallery.packMore", { count: pack.prompts.length - 5 })) : null));
+				}))
+				: h("p", { className: "st_hint" }, gallery ? t("gallery.packsEmpty") : t("common.loading"))),
 		h(Section, { key: "submit", title: t("gallery.submitTitle"), description: t("gallery.submitDescription") },
 			h("div", { className: "st_actions" },
 				h(Button, { kind: "primary", onClick: () => setSnap({ tab: "editor" }) }, t("gallery.openEditor")),

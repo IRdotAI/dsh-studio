@@ -1,0 +1,34 @@
+{
+  "id": "code-review-kit",
+  "name": "Code review kit",
+  "emoji": "🧰",
+  "author": "RdotA",
+  "description": "Reviews, security checks, tests and error explanations for everyday coding.",
+  "prompts": [
+    {
+      "title": "Review a change",
+      "text": "Review this change like a careful senior engineer. List real problems first (bugs, edge cases, missing error handling), then smaller suggestions. For each, give the line or function and a concrete fix:\n\n{clipboard}",
+      "folder": "Code review"
+    },
+    {
+      "title": "Security check",
+      "text": "Check this code for security problems: injection, unsafe input handling, secrets, authentication and permission gaps, and unsafe defaults. Rank findings by severity and show how to fix each:\n\n",
+      "folder": "Code review"
+    },
+    {
+      "title": "Explain this error",
+      "text": "Explain what this error means, the most likely causes in order, and how to confirm and fix each one:\n\n{clipboard}",
+      "folder": "Code review"
+    },
+    {
+      "title": "Suggest tests",
+      "text": "List the test cases this code needs (happy path, edge cases, failure modes), then write the most important ones using the project's test framework:\n\n",
+      "folder": "Code review"
+    },
+    {
+      "title": "Make it faster",
+      "text": "Find the slowest parts of this code and suggest improvements. Estimate the impact of each and keep behaviour identical:\n\n",
+      "folder": "Code review"
+    }
+  ]
+}

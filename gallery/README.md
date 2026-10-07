@@ -1,6 +1,6 @@
-# Studio theme gallery
+# Studio gallery
 
-Every theme in this folder shows up in the **Gallery** tab of Studio for everyone, one click to add.
+Every theme and prompt pack in this folder shows up in the **Gallery** tab of Studio for everyone, one click to add.
 
 ## Submit a theme
 
@@ -34,8 +34,41 @@ Add one file to `gallery/themes/`, named after the theme's `id`:
 
 Check it locally with `node scripts/build-gallery.mjs --check`.
 
+## Submit a prompt pack
+
+A prompt pack is a set of saved prompts, filed into folders, that anyone can add to their own list.
+
+From inside Studio:
+
+1. Open **Studio → Prompts** and put the prompts you want to share in a folder (or share them all).
+2. Pick the folder next to **🌍 Submit to the gallery** and press it.
+3. GitHub opens with the pack file filled in. Give it a name and a line about it, then **Propose changes** and **Create pull request**. (A very big pack is copied to your clipboard instead; paste it into the file.)
+
+By hand, add one file to `gallery/prompts/`, named after the pack's `id`:
+
+```json
+{
+  "id": "my-pack",
+  "name": "My pack",
+  "emoji": "✦",
+  "author": "your name or GitHub handle",
+  "description": "One short line about it.",
+  "prompts": [
+    { "title": "Summarise", "text": "Summarise this in five bullet points:
+
+{clipboard}", "folder": "Reading" },
+    { "title": "Explain", "text": "Explain {ask:Topic} to me like I'm new to it.", "folder": "Learning" }
+  ]
+}
+```
+
+- 1 to 50 prompts. `folder` is optional; prompts land in that folder when someone adds the pack.
+- Placeholders work as they do in Studio: `{clipboard}`, `{date}`, `{time}`, `{day}` and `{ask:Question}`.
+
+`node scripts/build-gallery.mjs --check` validates both themes and packs.
+
 ## Rules
 
-- Your own work, or a palette whose licence allows it (credit the original in `description`).
-- No logos, trademarks or offensive names.
-- Themes are published under the repository's MIT licence.
+- Your own work, or a palette or prompt whose licence allows it (credit the original in `description`).
+- No logos, trademarks or offensive names, and no prompts meant to cause harm.
+- Everything in the gallery is published under the repository's MIT licence.

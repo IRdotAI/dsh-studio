@@ -1,0 +1,34 @@
+{
+  "id": "writing-studio",
+  "name": "Writing studio",
+  "emoji": "✍️",
+  "author": "RdotA",
+  "description": "Tighten, re-tone and proofread anything you write.",
+  "prompts": [
+    {
+      "title": "Tighten this",
+      "text": "Make this clearer and shorter without losing meaning or my voice. Show the new version, then list the main cuts:\n\n{clipboard}",
+      "folder": "Writing"
+    },
+    {
+      "title": "Change the tone",
+      "text": "Rewrite this in a {ask:Tone} tone, keeping every fact the same:\n\n{clipboard}",
+      "folder": "Writing"
+    },
+    {
+      "title": "Notes to email",
+      "text": "Turn these notes into a friendly, well-organised email to {ask:Who is it for}. Keep it brief and end with a clear next step:\n\n{clipboard}",
+      "folder": "Writing"
+    },
+    {
+      "title": "Headline ideas",
+      "text": "Give me ten headline or title ideas for this, from straightforward to playful:\n\n",
+      "folder": "Writing"
+    },
+    {
+      "title": "Proofread",
+      "text": "Proofread this. Fix spelling, grammar and punctuation only, and list each change you made:\n\n{clipboard}",
+      "folder": "Writing"
+    }
+  ]
+}

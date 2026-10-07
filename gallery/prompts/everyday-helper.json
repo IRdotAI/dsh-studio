@@ -1,0 +1,34 @@
+{
+  "id": "everyday-helper",
+  "name": "Everyday helper",
+  "emoji": "☀️",
+  "author": "RdotA",
+  "description": "Plan your day, decide faster and turn notes into actions.",
+  "prompts": [
+    {
+      "title": "Plan my day",
+      "text": "Help me plan today ({day}). Here's what I need to do: {ask:Your to-do list}. Order it sensibly, estimate times, and add short breaks.",
+      "folder": "Everyday"
+    },
+    {
+      "title": "Summarise this",
+      "text": "Summarise this in five bullet points and one sentence on why it matters:\n\n{clipboard}",
+      "folder": "Everyday"
+    },
+    {
+      "title": "Help me decide",
+      "text": "Help me decide between {ask:Options}. Ask me up to three questions first if you need to, then give a recommendation with the trade-offs.",
+      "folder": "Everyday"
+    },
+    {
+      "title": "Draft a reply",
+      "text": "Draft a polite, clear reply to this message. Keep it short:\n\n{clipboard}",
+      "folder": "Everyday"
+    },
+    {
+      "title": "Meeting notes to actions",
+      "text": "Turn these meeting notes into a list of decisions and action items, each with an owner and a due date if mentioned:\n\n{clipboard}",
+      "folder": "Everyday"
+    }
+  ]
+}

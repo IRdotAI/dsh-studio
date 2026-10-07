@@ -1,11 +1,4 @@
 //#region Usage tab
-function money(usd, usage) {
-	const cur = CURRENCIES.find((c) => c.id === usage.currency) ?? CURRENCIES[0];
-	const value = usd * (usage.currency === "USD" ? 1 : usage.rate);
-	const digits = value !== 0 && Math.abs(value) < 1 ? 4 : 2;
-	return cur.symbol + value.toLocaleString(snapshot.lang, { minimumFractionDigits: 2, maximumFractionDigits: digits });
-}
-
 function UsageChart({ days }) {
 	const max = Math.max(1, ...days.map((d) => d.tokens));
 	const W = 600;
@@ -37,6 +30,47 @@ function PriceInput({ value, onCommit }) {
 	return h("input", { className: "st_input st_priceInput st_num", value: text, inputMode: "decimal", placeholder: "—", onChange: (e) => setText(e.target.value), onBlur: commit, onKeyDown: (e) => { if (e.key === "Enter") commit(); } });
 }
 
+/** A limit entered in the display currency, stored in US dollars (empty = no limit). */
+function BudgetInput({ usd, usage, onCommit }) {
+	const rate = usage.currency === "USD" ? 1 : usage.rate;
+	const shown = usd == null ? "" : String(Math.round(usd * rate * 100) / 100);
+	const [text, setText] = useState(shown);
+	useEffect(() => setText(shown), [shown]);
+	const commit = () => {
+		const v = text.trim();
+		if (!v) return onCommit(null);
+		const n = Number(v.replace(",", "."));
+		if (Number.isFinite(n) && n > 0) onCommit(n / rate);
+		else setText(shown);
+	};
+	const cur = CURRENCIES.find((c) => c.id === usage.currency) ?? CURRENCIES[0];
+	return h("div", { className: "st_moneyInput" },
+		h("span", { "aria-hidden": true }, cur.symbol),
+		h("input", { className: "st_input st_num", value: text, inputMode: "decimal", placeholder: t("budget.noLimit"), onChange: (e) => setText(e.target.value), onBlur: commit, onKeyDown: (e) => { if (e.key === "Enter") commit(); } }));
+}
+
+function BudgetMeter({ label, s }) {
+	if (!s || s.level === "off") return null;
+	const pct = Math.min(100, Math.round(s.ratio * 100));
+	return h("div", { className: "st_meterRow" },
+		h("div", { className: "st_meterHead" }, h("span", null, label), h("span", { className: "st_hint" }, t("budget.meter", { spent: money(s.spent), limit: money(s.limit), percent: Math.round(s.ratio * 100) }))),
+		h("div", { className: cls("st_meter", "st_meter_" + s.level), role: "meter", "aria-label": label, "aria-valuemin": 0, "aria-valuemax": 100, "aria-valuenow": pct }, h("span", { style: { width: pct + "%" } })));
+}
+
+function BudgetSection({ usage, status }) {
+	const b = usage.budget;
+	const set = (patch) => update({ usage: { budget: patch } });
+	return h(Section, { title: t("budget.title"), description: t("budget.description") },
+		h("div", { className: "st_row" },
+			h(Field, { label: t("budget.dailyLimit"), narrow: true }, h(BudgetInput, { usd: b.daily, usage, onCommit: (v) => set({ daily: v }) })),
+			h(Field, { label: t("budget.monthlyLimit"), narrow: true }, h(BudgetInput, { usd: b.monthly, usage, onCommit: (v) => set({ monthly: v }) })),
+			h(Slider, { label: t("budget.warnAt"), value: b.warnAt, min: 50, max: 100, step: 5, format: (v) => v + "%", onChange: (v) => set({ warnAt: v }) })),
+		h(BudgetMeter, { label: t("budget.today"), s: status?.daily }),
+		h(BudgetMeter, { label: t("budget.thisMonth"), s: status?.monthly }),
+		status?.unpriced ? h("p", { className: "st_hint", style: { margin: 0 } }, t("budget.unpriced", { count: status.unpriced })) : null,
+		h("span", { className: "st_hint" }, t("budget.hint")));
+}
+
 function UsageTab() {
 	const usage = useSnap((s) => s.state.usage);
 	const [data, setData] = useState(null);
@@ -49,7 +83,7 @@ function UsageTab() {
 		void refresh();
 		const timer = setInterval(refresh, 30_000);
 		return () => clearInterval(timer);
-	}, [usage.prices]);
+	}, [usage.prices, usage.budget]);
 
 	if (!data) return h(Section, { title: t("usage.title") }, h("p", { className: "st_hint" }, t("common.loading")));
 	if (data.error) return h(Section, { title: t("usage.title") }, h("p", { className: "st_creditLine" }, data.error));
@@ -73,6 +107,7 @@ function UsageTab() {
 	};
 
 	return [
+		h(BudgetSection, { key: "budget", usage, status: data.budget }),
 		h(Section, {
 			key: "totals",
 			title: t("usage.title"),
@@ -105,7 +140,7 @@ function UsageTab() {
 		h(Section, { key: "balance", title: t("usage.balanceTitle"), description: t("usage.balanceDescription", { env: usage.balanceEnv }), actions: h(Button, { disabled: balance?.loading, onClick: () => void checkBalance() }, t("usage.checkBalance")) },
 			balance && !balance.loading
 				? balance.error
-					? h("p", { className: "st_creditLine" }, balance.error)
+					? h("p", { className: "st_creditLine" }, hostText(balance.error))
 					: h("p", { className: "st_creditLine" }, balance.balances.map((b) => `${b.currency} ${b.total.toFixed(2)}`).join(" · ") + (balance.available ? "" : " · " + t("usage.unavailable")))
 				: null),
 		h(Section, {

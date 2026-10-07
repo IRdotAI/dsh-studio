@@ -15,7 +15,7 @@ const REPO_URL = "https://github.com/IRdotAI/dsh-studio";
 
 //#region store
 /** Services captured from the client context (null until injected). */
-const services = { theme: null, layout: null, locale: null, uiSession: null };
+const services = { theme: null, layout: null, locale: null, uiSession: null, uiWorkspace: null, sessions: null };
 
 let snapshot = {
 	state: defaultState(),
@@ -36,6 +36,12 @@ let snapshot = {
 	/** A saved prompt waiting for its {ask:…} answers: { prompt, sessionId, asks }. */
 	promptFill: null,
 	focus: false,
+	/** The workspace of the chat in view, and every workspace: { id, title, list: [{ id, title }] }. */
+	workspace: { id: "", title: "", list: [] },
+	/** Session id whose export dialog is open, or null. */
+	exportFor: null,
+	/** Latest budget status from the host (see budgetStatus), or null. */
+	budget: null,
 };
 const listeners = new Set();
 
@@ -51,12 +57,25 @@ function useSnap(select) {
 	return useSyncExternalStore(subscribe, () => select(snapshot));
 }
 
-const errorText = (e) => String(e?.message ?? e);
+/** A host message ({ code, params, text }) or plain string in the interface language. */
+function hostText(m) {
+	if (m == null) return "";
+	if (typeof m !== "object") return String(m);
+	const params = {};
+	for (const [k, v] of Object.entries(m.params ?? {})) params[k] = v && typeof v === "object" ? hostText(v) : v;
+	const key = "host." + m.code;
+	return dict[key] || EN[key] ? t(key, params) : String(m.text ?? m.code);
+}
+const errorText = (e) => (e?.info ? hostText(e.info) : String(e?.message ?? e));
 
 async function apiGet(path) {
 	const res = await fetch("/api/studio/" + path, { cache: "no-store" });
 	const data = await res.json().catch(() => ({}));
-	if (!res.ok) throw new Error(data.error || "HTTP " + res.status);
+	if (!res.ok) {
+		const error = new Error(data.error || "HTTP " + res.status);
+		error.info = data.errorInfo;
+		throw error;
+	}
 	return data;
 }
 async function apiPost(path, body) {
@@ -65,6 +84,7 @@ async function apiPost(path, body) {
 	if (!res.ok) {
 		const error = new Error(data.error || "HTTP " + res.status);
 		error.data = data;
+		error.info = data.errorInfo;
 		throw error;
 	}
 	return data;

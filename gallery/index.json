@@ -1,5 +1,5 @@
 {
-	"version": 1,
+	"version": 2,
 	"themes": [
 		{
 			"id": "aurora",
@@ -136,6 +136,144 @@
 				"fg": "#0b2a0b",
 				"accent": "#15803d"
 			}
+		}
+	],
+	"packs": [
+		{
+			"id": "code-review-kit",
+			"name": "Code review kit",
+			"emoji": "🧰",
+			"author": "RdotA",
+			"description": "Reviews, security checks, tests and error explanations for everyday coding.",
+			"prompts": [
+				{
+					"title": "Review a change",
+					"text": "Review this change like a careful senior engineer. List real problems first (bugs, edge cases, missing error handling), then smaller suggestions. For each, give the line or function and a concrete fix:\n\n{clipboard}",
+					"folder": "Code review"
+				},
+				{
+					"title": "Security check",
+					"text": "Check this code for security problems: injection, unsafe input handling, secrets, authentication and permission gaps, and unsafe defaults. Rank findings by severity and show how to fix each:\n\n",
+					"folder": "Code review"
+				},
+				{
+					"title": "Explain this error",
+					"text": "Explain what this error means, the most likely causes in order, and how to confirm and fix each one:\n\n{clipboard}",
+					"folder": "Code review"
+				},
+				{
+					"title": "Suggest tests",
+					"text": "List the test cases this code needs (happy path, edge cases, failure modes), then write the most important ones using the project's test framework:\n\n",
+					"folder": "Code review"
+				},
+				{
+					"title": "Make it faster",
+					"text": "Find the slowest parts of this code and suggest improvements. Estimate the impact of each and keep behaviour identical:\n\n",
+					"folder": "Code review"
+				}
+			]
+		},
+		{
+			"id": "everyday-helper",
+			"name": "Everyday helper",
+			"emoji": "☀️",
+			"author": "RdotA",
+			"description": "Plan your day, decide faster and turn notes into actions.",
+			"prompts": [
+				{
+					"title": "Plan my day",
+					"text": "Help me plan today ({day}). Here's what I need to do: {ask:Your to-do list}. Order it sensibly, estimate times, and add short breaks.",
+					"folder": "Everyday"
+				},
+				{
+					"title": "Summarise this",
+					"text": "Summarise this in five bullet points and one sentence on why it matters:\n\n{clipboard}",
+					"folder": "Everyday"
+				},
+				{
+					"title": "Help me decide",
+					"text": "Help me decide between {ask:Options}. Ask me up to three questions first if you need to, then give a recommendation with the trade-offs.",
+					"folder": "Everyday"
+				},
+				{
+					"title": "Draft a reply",
+					"text": "Draft a polite, clear reply to this message. Keep it short:\n\n{clipboard}",
+					"folder": "Everyday"
+				},
+				{
+					"title": "Meeting notes to actions",
+					"text": "Turn these meeting notes into a list of decisions and action items, each with an owner and a due date if mentioned:\n\n{clipboard}",
+					"folder": "Everyday"
+				}
+			]
+		},
+		{
+			"id": "learn-anything",
+			"name": "Learn anything",
+			"emoji": "🎓",
+			"author": "RdotA",
+			"description": "Explanations, quizzes and study plans for any topic.",
+			"prompts": [
+				{
+					"title": "Explain simply",
+					"text": "Explain {ask:Topic} as if I'm new to it: start with the big idea, then the key parts, then one everyday example.",
+					"folder": "Learning"
+				},
+				{
+					"title": "Quiz me",
+					"text": "Quiz me on {ask:Topic}. Ask one question at a time, wait for my answer, tell me if I'm right and why, then ask the next. Start easy and get harder.",
+					"folder": "Learning"
+				},
+				{
+					"title": "Study plan",
+					"text": "Make a {ask:How many weeks}-week study plan for learning {ask:Topic}, with goals, resources and a small project for each week.",
+					"folder": "Learning"
+				},
+				{
+					"title": "Compare two things",
+					"text": "Compare {ask:First thing} and {ask:Second thing}: what each is for, how they differ, and when to choose which. Finish with a short table.",
+					"folder": "Learning"
+				},
+				{
+					"title": "Analogy please",
+					"text": "Give me three different analogies that explain {ask:Concept}, and say where each one breaks down.",
+					"folder": "Learning"
+				}
+			]
+		},
+		{
+			"id": "writing-studio",
+			"name": "Writing studio",
+			"emoji": "✍️",
+			"author": "RdotA",
+			"description": "Tighten, re-tone and proofread anything you write.",
+			"prompts": [
+				{
+					"title": "Tighten this",
+					"text": "Make this clearer and shorter without losing meaning or my voice. Show the new version, then list the main cuts:\n\n{clipboard}",
+					"folder": "Writing"
+				},
+				{
+					"title": "Change the tone",
+					"text": "Rewrite this in a {ask:Tone} tone, keeping every fact the same:\n\n{clipboard}",
+					"folder": "Writing"
+				},
+				{
+					"title": "Notes to email",
+					"text": "Turn these notes into a friendly, well-organised email to {ask:Who is it for}. Keep it brief and end with a clear next step:\n\n{clipboard}",
+					"folder": "Writing"
+				},
+				{
+					"title": "Headline ideas",
+					"text": "Give me ten headline or title ideas for this, from straightforward to playful:\n\n",
+					"folder": "Writing"
+				},
+				{
+					"title": "Proofread",
+					"text": "Proofread this. Fix spelling, grammar and punctuation only, and list each change you made:\n\n{clipboard}",
+					"folder": "Writing"
+				}
+			]
 		}
 	]
 }

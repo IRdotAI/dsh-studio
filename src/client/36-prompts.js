@@ -10,6 +10,28 @@ function groupPrompts(prompts) {
 	return [...groups.entries()].sort(([a], [b]) => (a === "" ? -1 : b === "" ? 1 : a.localeCompare(b)));
 }
 
+/** Open GitHub's "new file" page with these prompts as a gallery pack, ready to propose. */
+function submitPackToGallery(prompts, name) {
+	const slug = (name || "prompts").toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40) || "prompts";
+	const pack = { id: slug, name: name || t("prompts.packDefaultName"), emoji: "✦", author: snapshot.state.identity.name || "", description: "", prompts: prompts.map(({ title, text, folder }) => ({ title, text, folder })) };
+	const repo = REPO_URL.replace("https://github.com/", "");
+	const json = JSON.stringify(pack, null, 2) + "\n";
+	const base = `https://github.com/${repo}/new/main/gallery/prompts?filename=${encodeURIComponent(slug + ".json")}`;
+	const full = `${base}&value=${encodeURIComponent(json)}`;
+	// GitHub refuses very long links, so a big pack goes through the clipboard instead.
+	if (full.length <= 7000) return void window.open(full, "_blank", "noopener");
+	void navigator.clipboard?.writeText(json).then(() => toast(t("prompts.packCopied")), () => toast(t("export.copyFailed")));
+	window.open(base, "_blank", "noopener");
+}
+
+function PackSubmitter({ prompts, folders }) {
+	const [folder, setFolder] = useState("*");
+	const chosen = folder === "*" ? prompts : prompts.filter((p) => (p.folder || "") === folder);
+	return h("div", { className: "st_row", style: { alignItems: "center" } },
+		h(Select, { value: folder, options: [{ id: "*", label: t("prompts.allPrompts") }, ...folders.map((f) => ({ id: f, label: "📁 " + f })), ...(prompts.some((p) => !p.folder) ? [{ id: "", label: t("prompts.unfiled") }] : [])], onChange: setFolder }),
+		h(Button, { disabled: !chosen.length, onClick: () => submitPackToGallery(chosen, folder === "*" || !folder ? "" : folder) }, "🌍 " + t("prompts.packSubmit", { count: chosen.length })));
+}
+
 function PromptsTab() {
 	const prompts = useSnap((s) => s.state.prompts);
 	const [editing, setEditing] = useState(null);
@@ -99,7 +121,9 @@ function PromptsTab() {
 				? h("div", { className: "st_row" },
 					h(Field, { label: t("prompts.packCode") }, h("input", { className: "st_input st_mono", value: packBox, onChange: (e) => setPackBox(e.target.value) })),
 					h(Button, { onClick: () => importPack(packBox) }, t("prompts.packAdd")))
-				: null),
+				: null,
+			prompts.length ? h("p", { className: "st_hint", style: { margin: "4px 0 0" } }, t("prompts.packGalleryHint")) : null,
+			prompts.length ? h(PackSubmitter, { prompts, folders }) : null),
 	];
 }
 //#endregion

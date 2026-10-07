@@ -22,11 +22,17 @@ These presets are adapted from open-source colour schemes. Some light-mode accen
 | Tokyo Night | enkia | [github.com/enkia/tokyo-night-vscode-theme](https://github.com/enkia/tokyo-night-vscode-theme) |
 | Rosé Pine | the Rosé Pine team | [rosepinetheme.com](https://rosepinetheme.com) |
 
-Original themes by RdotA: Liquid Glass, Midnight, Forest, Ocean, Synthwave, Sakura, Arc Reactor, Espresso, Paper and AMOLED.
+Original themes by RdotA: Liquid Glass, Midnight, Forest, Ocean, Synthwave, Sakura, Arc Reactor, Espresso, Paper, AMOLED and High Contrast.
 
-## Gallery themes
+## Gallery
 
-Every theme in the [community gallery](gallery/) carries its author's name, shown on its card in **Studio → Gallery**. The starter set (Aurora, Deep Space, Lavender Fields, Matcha, Mocha Mousse, Night City, Sunset Boulevard and Terminal) is by RdotA.
+Every theme and prompt pack in the [community gallery](gallery/) carries its author's name, shown on its card in **Studio → Gallery**. The starter themes (Aurora, Deep Space, Lavender Fields, Matcha, Mocha Mousse, Night City, Sunset Boulevard and Terminal) and starter prompt packs (Code review kit, Writing studio, Learn anything and Everyday helper) are by RdotA.
+
+## Other sources
+
+- **Bing daily** wallpapers are Microsoft Bing's picture of the day; each picture's own copyright line is shown under the wallpaper setting.
+- Sunrise and sunset times use the NOAA solar calculation (public domain).
+- The easy-reading font option uses OpenDyslexic, Atkinson Hyperlegible (Braille Institute) or Lexend when you have one of them installed; Studio doesn't ship any font files.
 
 ## Translations
 

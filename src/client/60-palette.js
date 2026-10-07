@@ -28,6 +28,13 @@ function paletteItems(state) {
 	}
 	for (const p of state.prompts) items.push({ id: "prompt:" + p.id, group: G("prompts"), icon: "✦", label: p.title, hint: p.folder, run: () => void insertPrompt(p) });
 	items.push({ id: "persona", group: G("ai"), icon: "🧠", label: state.persona.enabled ? t("palette.personaOff") : t("palette.personaOn"), run: () => update({ persona: { enabled: !state.persona.enabled } }) });
+	for (const m of state.persona.modes) {
+		const on = state.persona.enabled && state.persona.mode === m.id;
+		items.push({ id: "mode:" + m.id, group: G("ai"), icon: m.emoji, label: t("palette.mode", { name: modeName(m) }), hint: on ? t("palette.current") : "", run: () => applyMode(m) });
+	}
+	items.push({ id: "export", group: G("chat"), icon: "📤", label: t("palette.export"), run: () => { const id = currentSessionId(); if (id) setSnap({ exportFor: id }); else toast(t("host.export.noSession")); } });
+	items.push({ id: "a11y:contrast", group: G("appearance"), icon: "🔳", label: state.theme.active === "high-contrast" ? t("a11y.highContrastOff") : t("a11y.highContrastOn"), run: () => applyTheme(state.theme.active === "high-contrast" ? "default" : "high-contrast") });
+	items.push({ id: "a11y:transparency", group: G("appearance"), icon: "◻️", label: state.style.reduceTransparency ? t("palette.transparencyOn") : t("palette.transparencyOff"), run: () => update({ style: { reduceTransparency: !state.style.reduceTransparency } }) });
 	items.push({ id: "alerts", group: G("ai"), icon: "🔔", label: state.alerts.enabled ? t("palette.alertsOff") : t("palette.alertsOn"), run: () => update({ alerts: { enabled: !state.alerts.enabled } }) });
 	items.push({ id: "backup", group: G("sync"), icon: "☁️", label: t("palette.backup"), run: async () => { try { await apiPost("sync", { action: "push" }); toast(t("sync.backedUp")); } catch (e) { toast(errorText(e)); } } });
 	const u = snapshot.updates;
@@ -179,6 +186,7 @@ function CommandPalette() {
 					h("div", { className: "st_paletteFoot" }, h("span", null, t("palette.footBrowse")), h("span", null, t("palette.footApply")), h("span", null, t("palette.footClose")))))
 			: null,
 		h(PromptFillDialog, { key: "fill" }),
+		h(ExportDialog, { key: "export" }),
 		toastText ? h("div", { key: "toast", className: "st_toast", role: "status" }, toastText) : null,
 	];
 }

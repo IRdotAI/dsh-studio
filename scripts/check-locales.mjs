@@ -29,7 +29,8 @@ export function usedKeys() {
 	const ids = (list) => list.map((x) => x.id);
 	const families = {
 		"tab.": ["themes", "editor", "gallery", "style", "identity", "persona", "prompts", "alerts", "usage", "sync", "advanced", "updates", "credits"],
-		"palette.group.": ["themes", "looks", "appearance", "layout", "ambience", "prompts", "ai", "sync", "updates", "studio"],
+		"palette.group.": ["themes", "looks", "appearance", "layout", "ambience", "prompts", "ai", "chat", "sync", "updates", "studio"],
+		"budget.": ["daily", "monthly"],
 		"ambience.": ids(shared.AMBIENCES),
 		"material.": ids(shared.MATERIALS),
 		"radius.": ids(shared.RADII),
@@ -42,10 +43,15 @@ export function usedKeys() {
 		"usage.": ["today", "week", "month", "all"],
 	};
 	// tOr() families fall back to built-in text, so they're optional (checked only for consistency).
-	const optional = ["font.", "look.", "lookDesc.", "themeDesc.", "persona.style.", "persona.styleHint."];
+	const optional = ["font.", "look.", "lookDesc.", "themeDesc.", "persona.style.", "persona.styleHint.", "mode."];
 	for (const prefix of dynamic) {
 		if (families[prefix]) for (const id of families[prefix]) keys.add(prefix + id);
 		else if (!optional.includes(prefix)) keys.add(prefix + "*UNKNOWN-FAMILY*");
+	}
+	// Messages the host sends for translation: every StudioError code needs a "host.<code>" string.
+	keys.add("host.raw").add("host.timeout");
+	for (const name of readdirSync(new URL("lib/", root)).filter((n) => n.endsWith(".js") && n !== "client.js")) {
+		for (const m of read("lib/" + name).matchAll(/new StudioError\("([^"]+)"/g)) keys.add("host." + m[1]);
 	}
 	return keys;
 }

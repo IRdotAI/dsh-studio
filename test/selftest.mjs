@@ -8,7 +8,8 @@ import {
 	buildCss, personaPrompt, renderGreeting, randomTheme, resolveTheme, CSS_MARKER, LOOKS, parseVersion, compareVersions,
 	extractPalette, themeFromPalette, withAccent, scheduleSlot, promptPlaceholders, fillPrompt, usageSummary,
 	matchLanguage, cleanGalleryTheme, LANGUAGES, STOCK_THEME,
-} from "../lib/shared.js";
+	sunTimes, resolveEntryTime, budgetStatus, applyTargetToState, transcriptFromEvents, transcriptToMarkdown, markdownToHtml,
+	cleanGalleryPack, StudioError, hostMessage, wallpaperUrl, slideIndex, workspaceTarget } from "../lib/shared.js";
 import { UsageLog } from "../lib/usage.js";
 import { GistSync } from "../lib/sync.js";
 import { checkLocales } from "../scripts/check-locales.mjs";
@@ -430,6 +431,150 @@ test("layout: chat width and interface scale", () => {
 	assert.ok(!buildCss(defaultState()).includes("zoom"));
 	assert.equal(sanitizeState({ layout: { scale: 500, chatWidth: "huge" } }).layout.scale, 140);
 	assert.equal(sanitizeState({ layout: { chatWidth: "huge" } }).layout.chatWidth, "default");
+});
+
+test("sunrise and sunset: London summer and winter, polar day and night", () => {
+	const near = (date, hh, mm) => Math.abs(date.getUTCHours() * 60 + date.getUTCMinutes() - (hh * 60 + mm)) <= 5;
+	const summer = sunTimes(new Date(2026, 5, 21), 51.5, -0.13);
+	assert.ok(near(summer.sunrise, 3, 43) && near(summer.sunset, 20, 21), `${summer.sunrise.toISOString()} ${summer.sunset.toISOString()}`);
+	const winter = sunTimes(new Date(2026, 11, 21), 51.5, -0.13);
+	assert.ok(near(winter.sunrise, 8, 4) && near(winter.sunset, 15, 54), `${winter.sunrise.toISOString()} ${winter.sunset.toISOString()}`);
+	assert.equal(sunTimes(new Date(2026, 11, 21), 69.65, 18.96).polar, "night");
+	assert.equal(sunTimes(new Date(2026, 5, 21), 69.65, 18.96).polar, "day");
+	assert.equal(resolveEntryTime("sunrise", new Date(), null), "07:00");
+	assert.equal(resolveEntryTime("14:30", new Date(), { lat: 1, lon: 1 }), "14:30");
+});
+
+test("schedule with sunrise and sunset entries", () => {
+	const loc = { lat: 51.5, lon: -0.1 };
+	const day = new Date(2026, 3, 15, 12);
+	const { sunrise, sunset } = sunTimes(day, loc.lat, loc.lon);
+	const entries = [{ time: "sunrise", target: "theme:paper" }, { time: "sunset", target: "look:night" }];
+	const at = (d) => scheduleSlot(entries, d, loc).entry.target;
+	assert.equal(at(new Date(sunrise.getTime() + 3_600_000)), "theme:paper");
+	assert.equal(at(new Date(sunset.getTime() + 120_000)), "look:night");
+	assert.equal(at(new Date(sunrise.getTime() - 120_000)), "look:night", "before sunrise: yesterday's sunset");
+	assert.equal(scheduleSlot(entries, new Date(sunset.getTime() + 120_000), loc).key.split("@")[1], "sunset#look:night", "keys use the entry, not the day's exact minute");
+	const s = sanitizeState({ schedule: { entries: [{ time: "sunset", target: "theme:nord" }, { time: "noon", target: "theme:nord" }], location: { lat: 51.50735, lon: -0.12776 } } });
+	assert.deepEqual(s.schedule.entries, [{ time: "sunset", target: "theme:nord" }]);
+	assert.deepEqual(s.schedule.location, { lat: 51.5, lon: -0.1 }, "rounded to about 10 km");
+});
+
+test("budget: calendar day and month, warn and over levels, unpriced calls", () => {
+	const now = new Date(2026, 9, 15, 12);
+	const prices = { chat: { input: 1, output: 2, cacheRead: 0.5 } };
+	const rec = (daysAgo, m = "chat") => ({ t: now.getTime() - daysAgo * 86_400_000, m, a: 1_000_000, o: 0, r: 0, w: 0 });
+	const records = [rec(0), rec(0), rec(3), rec(20), rec(0, "mystery")];
+	const status = budgetStatus(records, prices, { daily: 2.5, monthly: 2.8, warnAt: 80 }, now);
+	assert.equal(status.daily.spent, 2);
+	assert.equal(status.daily.level, "warn", "2 of 2.50 is past 80%");
+	assert.equal(status.monthly.spent, 3, "the call 20 days ago was last month");
+	assert.equal(status.monthly.level, "over");
+	assert.equal(status.unpriced, 1);
+	assert.equal(status.daily.period, "2026-10-15");
+	assert.equal(budgetStatus(records, prices, { daily: null, monthly: null }, now).daily.level, "off");
+	const s = sanitizeState({ usage: { budget: { daily: "5", monthly: 20, warnAt: 5 } } });
+	assert.deepEqual(s.usage.budget, { daily: null, monthly: 20, warnAt: 10 });
+});
+
+test("AI modes: starter modes, validation, active mode must exist", () => {
+	const d = defaultState();
+	assert.deepEqual(d.persona.modes.map((m) => m.id), ["m_coding", "m_writing", "m_simple", "m_brainstorm"]);
+	const s = sanitizeState({ persona: { modes: [{ id: "x", name: "X", style: "nonsense", instructions: "Be brief." }, { id: "x", name: "dupe" }, { id: "../y" }], mode: "x" } });
+	assert.deepEqual(s.persona.modes, [{ id: "x", name: "X", emoji: "✨", style: "default", language: "", instructions: "Be brief." }]);
+	assert.equal(s.persona.mode, "x");
+	assert.equal(sanitizeState({ persona: { mode: "gone" } }).persona.mode, "");
+});
+
+test("workspace themes and other targets apply without saving", () => {
+	const base = sanitizeState({
+		theme: { active: "paper" },
+		looks: [{ id: "night", name: "Night", theme: { active: "nord" }, style: { material: "glass" }, wallpaper: { src: "bing" } }],
+		workspaceThemes: { ws_a: "look:night", ws_b: "theme:dracula", bad: "rm -rf" },
+		cache: { workspace: "ws_b" },
+	});
+	assert.deepEqual(Object.keys(base.workspaceThemes), ["ws_a", "ws_b"]);
+	assert.equal(applyTargetToState(base, "theme:nord").theme.active, "nord");
+	const night = applyTargetToState(base, "look:night");
+	assert.deepEqual([night.theme.active, night.style.material, night.wallpaper.src], ["nord", "glass", "bing"]);
+	assert.equal(applyTargetToState(base, "builtin:liquid-glass-desktop").theme.active, "liquid-glass");
+	assert.equal(applyTargetToState(base, "look:missing"), base);
+	assert.ok(buildCss(base).includes("--dsw-static-neutral-bluish-950:#282a36"), "the remembered open workspace (Dracula) shows at first paint");
+	assert.ok(buildCss(base, { workspace: "ws_c" }).includes("--dsw-static-neutral-bluish-950:" + PRESETS.find((p) => p.id === "paper").dark.bg), "other workspaces use the saved theme");
+	assert.equal(base.theme.active, "paper", "nothing saved");
+	const contrast = { ...base, theme: { ...base.theme, active: "high-contrast" } };
+	assert.equal(workspaceTarget(contrast, "ws_b"), "", "High Contrast wins over a workspace theme");
+	assert.ok(buildCss(contrast).includes("--dsw-static-neutral-bluish-950:#000000"), "and shows at first paint");
+});
+
+test("wallpapers: Bing, slideshow, video, and reduced transparency", () => {
+	const now = new Date(2026, 9, 7);
+	assert.equal(wallpaperUrl({ src: "bing" }, now), "/api/studio/bing-wallpaper?d=2026-10-07");
+	assert.equal(wallpaperUrl({ src: "folder" }, now, 3), "/api/studio/wallpaper-file?i=3");
+	assert.equal(slideIndex(5, 30, 7 * 30 * 60_000 + 10), 2);
+	assert.equal(slideIndex(0, 30), 0);
+	const video = sanitizeState({ wallpaper: { src: "video", video: "C:\\Videos\\rain.mp4", blur: 4 } });
+	const css = buildCss(video);
+	assert.ok(css.includes("html:root body>#studio-wall-video{position:fixed") && !css.includes("html:root::before"));
+	assert.equal(sanitizeState({ wallpaper: { video: "C:\\evil.exe" } }).wallpaper.video, "");
+	assert.equal(sanitizeState({ wallpaper: { video: "https://x.test/a.mp4" } }).wallpaper.video, "https://x.test/a.mp4");
+	assert.equal(sanitizeState({ wallpaper: { src: "javascript:alert(1)" } }).wallpaper.src, "");
+	const glassy = sanitizeState({ style: { material: "glass", reduceTransparency: true }, wallpaper: { src: "bing" }, cache: { glassSelectors: [".a"] } });
+	const solid = buildCss(glassy);
+	assert.ok(!solid.includes("backdrop-filter") && !solid.includes("bing-wallpaper"), "reduce transparency: no glass, no wallpaper");
+	assert.ok(!buildCss({ ...glassy, style: { ...glassy.style, reduceTransparency: false } }, { reduceTransparency: true }).includes("backdrop-filter"), "the system setting counts too");
+});
+
+test("accessibility: easy-reading spacing, focus outlines, High Contrast", () => {
+	assert.ok(buildCss(sanitizeState({ style: { uiFont: "readable" } })).includes("letter-spacing:.02em"));
+	assert.ok(buildCss(sanitizeState({ style: { focusRings: true } })).includes(":focus-visible{outline:3px solid"));
+	const hc = buildCss(sanitizeState({ theme: { active: "high-contrast" } }));
+	assert.ok(hc.includes(":focus-visible") && hc.includes("--dsw-static-neutral-bluish-950:#000000"));
+});
+
+test("chat export: transcript from events, Markdown, and safe HTML", () => {
+	const text = (t) => [{ type: "text", text: t }];
+	const events = [
+		{ type: "system/message", time: 1, data: { content: text("system prompt") } },
+		{ type: "user/message", time: 2, data: { role: "user", source: { kind: "user" }, content: text("Fix the bug") } },
+		{ type: "assistant/message", time: 3, data: { message: { content: [{ type: "reasoning", text: "thinking" }, { type: "tool-call", id: "1", name: "read_file", arguments: "{}" }] } } },
+		{ type: "tool/result", time: 4, data: {} },
+		{ type: "assistant/message", time: 5, data: { message: { content: text("Done, see below.") } } },
+		{ type: "turn/end", time: 6, data: {} },
+		{ type: "user/message", time: 7, data: { role: "user", source: { kind: "tool" }, content: text("not typed by a person") } },
+		{ type: "user/message", time: 8, data: { role: "user", content: text("Thanks!") } },
+		{ type: "assistant/message", time: 9, data: { message: { content: text("Any time.") } } },
+	];
+	const messages = transcriptFromEvents(events);
+	assert.deepEqual(messages.map((m) => [m.role, m.text, m.tools]), [["user", "Fix the bug", []], ["assistant", "Done, see below.", ["read_file"]], ["user", "Thanks!", []], ["assistant", "Any time.", []]]);
+	const md = transcriptToMarkdown({ title: "Bug", messages, exportedAt: new Date(2026, 9, 7) }, { you: "Me" });
+	assert.ok(md.startsWith("# Bug\n") && md.includes("## Me\n\nFix the bug") && md.includes("> Tools used: `read_file`"));
+	const html = markdownToHtml("# Hi <b>\n\n```js\nif (a < b) alert(1)\n```\n\n- one\n- **two**\n\n| a | b |\n|---|---|\n| 1 | `x` |\n\n[ok](https://example.com) [bad](javascript:alert(1)) <img src=x onerror=alert(1)>");
+	assert.ok(html.includes("<h1>Hi &lt;b&gt;</h1>"));
+	assert.ok(html.includes('<pre><code class="language-js">if (a &lt; b) alert(1)</code></pre>'));
+	assert.ok(html.includes("<ul><li>one</li><li><strong>two</strong></li></ul>"));
+	assert.ok(html.includes("<table><thead><tr><th>a</th><th>b</th></tr></thead><tbody><tr><td>1</td><td><code>x</code></td></tr></tbody></table>"));
+	assert.ok(html.includes('<a href="https://example.com">ok</a>') && !html.includes('href="javascript'));
+	assert.ok(!html.includes("<img") && html.includes("&lt;img"), "raw HTML in a chat is shown, never run");
+});
+
+test("gallery prompt packs are validated; the shipped packs are clean", () => {
+	assert.equal(cleanGalleryPack({ id: "x", prompts: [] }), null);
+	assert.equal(cleanGalleryPack({ id: "../x", prompts: [{ text: "a" }] }), null);
+	const pack = cleanGalleryPack({ id: "p", name: "P", author: "RdotA", prompts: [{ title: "A", text: "a", folder: "F" }, { title: "empty", text: "  " }] });
+	assert.deepEqual(pack.prompts, [{ title: "A", text: "a", folder: "F" }]);
+	const index = JSON.parse(readFileSync(new URL("../gallery/index.json", import.meta.url), "utf8"));
+	assert.ok(index.packs.length >= 4);
+	for (const p of index.packs) assert.deepEqual(cleanGalleryPack(p), p, p.id);
+});
+
+test("host messages carry translatable codes, nested reasons and English fallbacks", () => {
+	const inner = new StudioError("sync.noToken", {}, "no GitHub token yet");
+	const msg = hostMessage(new StudioError("sync.backupFailed", { reason: inner }, "Backup failed: no GitHub token yet"));
+	assert.deepEqual(msg, { code: "sync.backupFailed", params: { reason: { code: "sync.noToken", params: {}, text: "no GitHub token yet" } }, text: "Backup failed: no GitHub token yet" });
+	assert.deepEqual(hostMessage(new Error("boom")), { code: "raw", params: { text: "boom" }, text: "boom" });
+	assert.equal(hostMessage(Object.assign(new Error("x"), { name: "AbortError" })).code, "timeout");
+	assert.equal(hostMessage(msg), msg, "already a message");
 });
 
 for (const run of pending) await run();

@@ -68,7 +68,7 @@ function applyTarget(target, quiet) {
 function scheduleTick() {
 	const sched = snapshot.state.schedule;
 	if (!snapshot.loaded || !sched.enabled || !sched.entries.length) return;
-	const slot = scheduleSlot(sched.entries, new Date());
+	const slot = scheduleSlot(sched.entries, new Date(), sched.location);
 	if (!slot || slot.key === sched.applied) return;
 	applyTarget(slot.entry.target, true);
 	update({ schedule: { applied: slot.key } });
