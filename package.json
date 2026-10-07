@@ -1,7 +1,7 @@
 {
   "name": "dsh-studio",
   "description": "Themes and personalisation for DeepSeek Harness: 17 themes and a theme editor, liquid-glass panels, wallpapers, fonts, your own app name/logo/greeting, saved prompts, a Ctrl+K quick switcher, and optional custom instructions for the AI",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": true,
   "author": "RdotA",
   "license": "MIT",

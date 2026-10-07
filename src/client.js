@@ -47,7 +47,7 @@ textarea.st_input{resize:vertical;min-height:96px;line-height:1.5}
 .st_btn_small{padding:3px 8px;font-size:12px}
 .st_seg{display:inline-flex;flex-wrap:wrap;gap:2px;padding:2px;border-radius:var(--dsw-radius-sm);background:var(--dsw-alias-bg-module-platform)}
 .st_segBtn{border:0;background:none;font:inherit;font-size:12.5px;color:var(--dsw-alias-label-secondary);padding:5px 11px;border-radius:calc(var(--dsw-radius-sm) - 2px);cursor:pointer}
-.st_segBtn[aria-pressed=true]{background:var(--dsw-alias-bg-layer-1);color:var(--dsw-alias-label-primary);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.st_segBtn[aria-pressed=true]{background:var(--dsw-alias-bg-layer-1) linear-gradient(var(--dsw-alias-interactive-bg-active),var(--dsw-alias-interactive-bg-active));color:var(--dsw-alias-label-primary);box-shadow:0 1px 2px rgba(0,0,0,.12),inset 0 0 0 .5px var(--dsw-alias-border-l4)}
 .st_toggle{display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:13px;line-height:20px}
 .st_switch{flex:none;position:relative;width:32px;height:18px;margin-top:1px;border-radius:999px;background:var(--dsw-alias-bg-overlay);transition:background .15s}
 .st_switch::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--dsw-alias-switch-thumb,#fff);transition:transform .15s;box-shadow:0 1px 2px rgba(0,0,0,.25)}
@@ -97,6 +97,20 @@ textarea.st_input{resize:vertical;min-height:96px;line-height:1.5}
 .st_markEmoji{display:inline-flex;align-items:center;justify-content:center;line-height:1}
 .st_markMono{display:inline-flex;align-items:center;justify-content:center;border-radius:28%;font-weight:700;letter-spacing:-.02em;color:#fff;background:linear-gradient(135deg,var(--dsw-alias-state-business-primary),var(--studio-accent-2,#c46be0));text-transform:uppercase}
 .st_markImg{border-radius:24%;object-fit:cover}
+.st_creditHero{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:22px 24px;border-radius:var(--dsw-radius-lg);border:.5px solid color-mix(in srgb,var(--dsw-alias-state-business-primary) 40%,transparent);background:linear-gradient(120deg,color-mix(in srgb,var(--dsw-alias-state-business-primary) 16%,transparent),color-mix(in srgb,var(--studio-accent-2,#5ad8e0) 12%,transparent))}
+.st_creditMark{display:inline-flex;align-items:center;justify-content:center;width:60px;height:60px;border-radius:28%;color:#fff;background:linear-gradient(135deg,var(--dsw-alias-state-business-primary),var(--studio-accent-2,#5ad8e0));box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 6px 18px rgba(0,0,0,.25)}
+.st_creditText{flex:1;min-width:200px;display:flex;flex-direction:column;gap:3px}
+.st_creditTitle{font-size:22px;font-weight:600;line-height:28px}
+.st_creditVersion{font-size:12px;font-weight:500;font-family:var(--ds-font-family-code);color:var(--dsw-alias-label-tertiary);vertical-align:middle}
+.st_creditBy{font-size:15px;color:var(--dsw-alias-label-secondary)}
+.st_creditBy strong{color:var(--dsw-alias-label-primary);font-weight:600}
+.st_creditRow{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:.5px solid var(--dsw-alias-border-l2)}
+.st_creditRow:last-child{border-bottom:0}
+.st_creditName{font-size:13px;font-weight:500;min-width:110px}
+.st_creditLine{margin:0;font-size:13px;line-height:20px;color:var(--dsw-alias-label-secondary)}
+.st_link{color:var(--dsw-alias-link,var(--dsw-alias-state-business-primary));text-decoration:none;font-size:13px;white-space:nowrap}
+.st_link:hover{text-decoration:underline}
+a.st_btn{text-decoration:none}
 .st_markThumb{position:relative;width:56px;height:56px;flex:none}
 .st_markThumb img{width:56px;height:56px;border-radius:24%;object-fit:cover;border:.5px solid var(--dsw-alias-border-l4);display:block}
 .st_markRemove{position:absolute;top:-8px;right:-8px;width:22px;height:22px;padding:0;border-radius:50%;corner-shape:round;display:inline-flex;align-items:center;justify-content:center;font:inherit;font-size:15px;line-height:1;color:var(--dsw-alias-label-primary);background:var(--dsw-alias-bg-layer-3);border:.5px solid var(--dsw-alias-border-l4);box-shadow:0 2px 6px rgba(0,0,0,.3);cursor:pointer}
@@ -1083,6 +1097,55 @@ function AdvancedTab() {
 	];
 }
 
+const STUDIO_VERSION = "__STUDIO_VERSION__"; // filled in from package.json by scripts/build.mjs
+const REPO_URL = "https://github.com/IRdotAI/dsh-studio";
+
+/** The open-source colour schemes some presets are adapted from. */
+const PALETTE_CREDITS = [
+	{ name: "Dracula", by: "Zeno Rocha and contributors", url: "https://draculatheme.com" },
+	{ name: "Nord", by: "Sven Greb (Arctic Ice Studio)", url: "https://www.nordtheme.com" },
+	{ name: "Catppuccin", by: "the Catppuccin community", url: "https://catppuccin.com" },
+	{ name: "Gruvbox", by: "Pavel Pertsev (morhetz)", url: "https://github.com/morhetz/gruvbox" },
+	{ name: "Solarized", by: "Ethan Schoonover", url: "https://ethanschoonover.com/solarized/" },
+	{ name: "Tokyo Night", by: "enkia", url: "https://github.com/enkia/tokyo-night-vscode-theme" },
+	{ name: "Rosé Pine", by: "the Rosé Pine team", url: "https://rosepinetheme.com" },
+];
+
+function ExternalLink({ href, children }) {
+	return h("a", { className: "st_link", href, target: "_blank", rel: "noopener noreferrer" }, children);
+}
+
+function CreditsTab() {
+	const adapted = new Set(PALETTE_CREDITS.map((c) => c.name));
+	const originals = PRESETS.filter((p) => !adapted.has(p.name)).map((p) => `${p.emoji} ${p.name}`);
+	return [
+		h("div", { key: "hero", className: "st_creditHero" },
+			h("span", { className: "st_creditMark", "aria-hidden": true }, h(PaletteIcon, { size: 30 })),
+			h("div", { className: "st_creditText" },
+				h("div", { className: "st_creditTitle" }, "Studio ", h("span", { className: "st_creditVersion" }, "v" + STUDIO_VERSION)),
+				h("div", { className: "st_creditBy" }, "Made by ", h("strong", null, "RdotA")),
+				h("div", { className: "st_hint" }, "Themes and personal touches for DeepSeek Harness.")),
+			h("div", { className: "st_actions" },
+				h("a", { className: "st_btn st_btn_primary", href: REPO_URL, target: "_blank", rel: "noopener noreferrer" }, "View on GitHub"),
+				h("a", { className: "st_btn", href: REPO_URL + "/issues", target: "_blank", rel: "noopener noreferrer" }, "Report a problem"))),
+		h(Section, { key: "built", title: "Built on" },
+			h("p", { className: "st_creditLine" },
+				h(ExternalLink, { href: "https://github.com/deepseek-ai/deepseek-harness" }, "DeepSeek Harness"),
+				" by DeepSeek, released under the MIT licence. Studio plugs into its theme, slot and plugin systems; the whale logo restored by ",
+				h("em", null, "Original"), " is DeepSeek's own mark.")),
+		h(Section, { key: "palettes", title: "Theme palettes", description: "These presets are adapted from open-source colour schemes. Some light-mode accents are darkened so text stays readable." },
+			h("div", null, PALETTE_CREDITS.map((c) => h("div", { key: c.name, className: "st_creditRow" },
+				h("span", { className: "st_creditName" }, c.name),
+				h("span", { className: "st_hint", style: { flex: 1 } }, "by " + c.by),
+				h(ExternalLink, { href: c.url }, "Website ↗")))),
+			h("p", { className: "st_creditLine" }, "Original themes by RdotA: ", originals.join(" · "), ".")),
+		h(Section, { key: "licence", title: "Licence" },
+			h("p", { className: "st_creditLine" },
+				"Studio is free and open-source software under the MIT licence. Copyright © 2026 RdotA. ",
+				h(ExternalLink, { href: REPO_URL + "/blob/main/LICENSE" }, "Read the licence ↗"))),
+	];
+}
+
 const TABS = [
 	{ id: "themes", label: "Themes", component: ThemesTab },
 	{ id: "editor", label: "Theme editor", component: EditorTab },
@@ -1091,6 +1154,7 @@ const TABS = [
 	{ id: "persona", label: "AI preferences", component: PersonaTab },
 	{ id: "prompts", label: "Prompts", component: PromptsTab },
 	{ id: "advanced", label: "Advanced", component: AdvancedTab },
+	{ id: "credits", label: "Credits", component: CreditsTab },
 ];
 
 function StudioPage() {

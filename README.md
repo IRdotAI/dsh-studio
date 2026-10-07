@@ -4,11 +4,15 @@ Themes and personalisation for [DeepSeek Harness](https://github.com/deepseek-ai
 
 Zero npm dependencies. Everything stays on your machine.
 
-![Studio themes page](docs/screenshots/themes-dark.jpg)
+![Studio with the Liquid Glass theme and frosted-glass panels](docs/screenshots/themes-dark.jpg)
 
-| Quick switcher (live preview) | Theme editor | Personal greeting |
+| Liquid glass + personal greeting | Quick switcher (live preview) | Theme editor |
 | --- | --- | --- |
-| ![Ctrl+K quick switcher previewing Tokyo Night](docs/screenshots/quick-switcher.jpg) | ![Theme editor](docs/screenshots/theme-editor.jpg) | ![Greeting and monogram logo](docs/screenshots/greeting.jpg) |
+| ![Frosted-glass composer over a wallpaper, greeting "Good night, RdotA"](docs/screenshots/greeting.jpg) | ![Ctrl+K quick switcher previewing Tokyo Night](docs/screenshots/quick-switcher.jpg) | ![Theme editor](docs/screenshots/theme-editor.jpg) |
+
+| Saved prompts | Light mode (Synthwave) | Credits |
+| --- | --- | --- |
+| ![Saved prompts menu beside the composer](docs/screenshots/saved-prompts.jpg) | ![Studio themes page in light mode](docs/screenshots/themes-light.jpg) | ![Credits page](docs/screenshots/credits.jpg) |
 
 ## Install
 
@@ -48,6 +52,7 @@ To update, run the same `add` command again. To remove it, use **Uninstall** on 
 | **AI preferences** | Optional custom instructions: your name, about you, a response style (Concise, Thorough, Friendly, Mentor, Butler, Hype), reply language and free-form instructions. **Off by default**; the tab shows exactly what the model will receive. |
 | **Saved prompts** | Six starters; add, edit and reorder your own. They're inserted at your cursor. |
 | **Advanced** | Custom CSS (applied last; use the `--dsw-*` design tokens), export/import settings as JSON, reset. |
+| **Credits** | Who made Studio, what it builds on, and where each adapted theme palette comes from. |
 
 ## Privacy
 
@@ -100,10 +105,7 @@ Restart `dsh web` after changing `lib/index.js` (host modules are cached).
 
 ## Credits
 
-- Theme palettes are based on these open-source colour schemes, adapted with some light-mode accents darkened for contrast: [Dracula](https://draculatheme.com), [Nord](https://www.nordtheme.com), [Catppuccin](https://catppuccin.com), [Gruvbox](https://github.com/morhetz/gruvbox), [Solarized](https://ethanschoonover.com/solarized/), [Tokyo Night](https://github.com/folke/tokyonight.nvim) and [Rosé Pine](https://rosepinetheme.com). All other themes are original.
-- The DeepSeek whale shown when you restore the original logo is DeepSeek Harness's own mark; DSH is MIT-licensed by DeepSeek.
-
-Made by **RdotA**.
+Made by **RdotA**. Theme palettes adapted from Dracula, Nord, Catppuccin, Gruvbox, Solarized, Tokyo Night and Rosé Pine. Full credits, with links, are in [CREDITS.md](CREDITS.md) and in the app under **Studio → Credits**.
 
 ## Licence
 
