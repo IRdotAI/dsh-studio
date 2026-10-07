@@ -163,6 +163,7 @@ Restart `dsh web` after changing anything under `lib/` (host modules are cached)
 - A `requestBody: "streaming"` route cannot serve GET (the bridge always attaches a body). Keep reads `buffered`.
 - A host-injected `<style>` using `html:root body` selectors outranks DSH's token sheets and also covers the first paint.
 - DSH portals its menus to `<body>` and positions them from on-screen rectangles, so scale the app with `zoom` on `#root`, never on `<html>`.
+- A plugin slash command with the same name as a host command (`/export`, `/plan`, `/goal`, …) makes the whole `/` menu fail. Host rows also rank first, so a name that is the start of a host command (`/mode` vs `/model`) can never be picked with Enter. Studio checks the host's commands before offering each of its own.
 
 ## Credits
 
