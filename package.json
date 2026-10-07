@@ -1,7 +1,7 @@
 {
   "name": "dsh-studio",
-  "description": "Themes and personalisation for DeepSeek Harness: 17 themes and a theme editor, liquid-glass panels, wallpapers, fonts, your own app name/logo/greeting, saved prompts, a Ctrl+K quick switcher, and optional custom instructions for the AI",
-  "version": "1.3.0",
+  "description": "Themes and personalisation for DeepSeek Harness: 17 themes, a theme editor (also from any image), a community gallery, liquid-glass panels, wallpapers, fonts, saved looks with a time-of-day schedule, Windows accent colours, layout and focus mode, task-finished alerts, a usage and cost dashboard, smarter saved prompts, settings sync via a private GitHub Gist, a Ctrl+K quick switcher, and 19 languages",
+  "version": "2.0.0",
   "private": true,
   "author": "RdotA",
   "license": "MIT",
@@ -16,7 +16,10 @@
     "dsh-plugin",
     "themes",
     "personalisation",
-    "liquid-glass"
+    "liquid-glass",
+    "gallery",
+    "usage",
+    "i18n"
   ],
   "type": "module",
   "main": "lib/index.js",
@@ -32,7 +35,11 @@
     "lib/index.js",
     "lib/shared.js",
     "lib/updater.js",
+    "lib/usage.js",
+    "lib/windows.js",
+    "lib/sync.js",
     "lib/client.js",
+    "locales",
     "cordis.patch.yml"
   ],
   "scripts": {

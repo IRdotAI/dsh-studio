@@ -1,0 +1,17 @@
+{
+  "id": "matcha",
+  "name": "Matcha",
+  "emoji": "🍵",
+  "author": "RdotA",
+  "description": "Whisked green tea and warm oat milk.",
+  "dark": {
+    "bg": "#141a14",
+    "fg": "#e7efe1",
+    "accent": "#a3d977"
+  },
+  "light": {
+    "bg": "#f4f7ee",
+    "fg": "#1f2a1c",
+    "accent": "#4d7c0f"
+  }
+}

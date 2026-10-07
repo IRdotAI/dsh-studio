@@ -1,0 +1,17 @@
+{
+  "id": "night-city",
+  "name": "Night City",
+  "emoji": "🌃",
+  "author": "RdotA",
+  "description": "Cyberpunk yellow on rain-slick black.",
+  "dark": {
+    "bg": "#0a0a12",
+    "fg": "#f0f0ff",
+    "accent": "#fcee0a"
+  },
+  "light": {
+    "bg": "#fffde6",
+    "fg": "#111018",
+    "accent": "#7a6100"
+  }
+}

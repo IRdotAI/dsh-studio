@@ -1,0 +1,17 @@
+{
+  "id": "aurora",
+  "name": "Aurora",
+  "emoji": "🌌",
+  "author": "RdotA",
+  "description": "Northern lights over a polar night: teal glow on deep indigo.",
+  "dark": {
+    "bg": "#0b1020",
+    "fg": "#e6f0ff",
+    "accent": "#5eead4"
+  },
+  "light": {
+    "bg": "#f3f8ff",
+    "fg": "#0b1020",
+    "accent": "#0f766e"
+  }
+}

@@ -24,6 +24,14 @@ These presets are adapted from open-source colour schemes. Some light-mode accen
 
 Original themes by RdotA: Liquid Glass, Midnight, Forest, Ocean, Synthwave, Sakura, Arc Reactor, Espresso, Paper and AMOLED.
 
+## Gallery themes
+
+Every theme in the [community gallery](gallery/) carries its author's name, shown on its card in **Studio → Gallery**. The starter set (Aurora, Deep Space, Lavender Fields, Matcha, Mocha Mousse, Night City, Sunset Boulevard and Terminal) is by RdotA.
+
+## Translations
+
+Studio's interface is available in 19 languages: English, 简体中文, 繁體中文, 日本語, 한국어, Español, Français, Deutsch, Português (Brasil), Italiano, Русский, Українська, Polski, Nederlands, Türkçe, Tiếng Việt, Bahasa Indonesia, हिन्दी and العربية. Not every translation has been reviewed by a native speaker yet, so corrections are very welcome: edit the file for your language in [`locales/`](locales/) and open a pull request. `node scripts/check-locales.mjs` checks that nothing is missing.
+
 ## Licence
 
 Studio is free and open-source software under the [MIT licence](LICENSE). Copyright © 2026 RdotA.

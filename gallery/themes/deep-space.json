@@ -1,0 +1,17 @@
+{
+  "id": "deep-space",
+  "name": "Deep Space",
+  "emoji": "🪐",
+  "author": "RdotA",
+  "description": "Starlight periwinkle on the darkest void.",
+  "dark": {
+    "bg": "#05060f",
+    "fg": "#dfe6ff",
+    "accent": "#7c8cff"
+  },
+  "light": {
+    "bg": "#f5f7ff",
+    "fg": "#10142b",
+    "accent": "#3949ab"
+  }
+}

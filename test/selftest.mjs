@@ -1,21 +1,32 @@
 // node test/selftest.mjs — dependency-free checks for the shared core and the built bundle.
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import {
 	PRESETS, themeTokens, contrast, hexToOklch, oklchToHex, normHex, sanitizeState, defaultState, mergePatch,
 	buildCss, personaPrompt, renderGreeting, randomTheme, resolveTheme, CSS_MARKER, LOOKS, parseVersion, compareVersions,
+	extractPalette, themeFromPalette, withAccent, scheduleSlot, promptPlaceholders, fillPrompt, usageSummary,
+	matchLanguage, cleanGalleryTheme, LANGUAGES, STOCK_THEME,
 } from "../lib/shared.js";
+import { UsageLog } from "../lib/usage.js";
+import { GistSync } from "../lib/sync.js";
+import { checkLocales } from "../scripts/check-locales.mjs";
 
 let passed = 0;
+const pending = [];
 const test = (name, fn) => {
-	try {
-		fn();
-		passed++;
-		console.log("  ok  " + name);
-	} catch (error) {
-		console.error("FAIL  " + name + "\n" + (error?.stack ?? error));
-		process.exitCode = 1;
-	}
+	const run = async () => {
+		try {
+			await fn();
+			passed++;
+			console.log("  ok  " + name);
+		} catch (error) {
+			console.error("FAIL  " + name + "\n" + (error?.stack ?? error));
+			process.exitCode = 1;
+		}
+	};
+	pending.push(run);
 };
 
 test("hex ↔ OKLCH round-trips exactly", () => {
@@ -219,4 +230,207 @@ test("built browser bundle registers through the ModuleLoader and exports apply/
 	assert.deepEqual(exports.inject, ["slots"]);
 });
 
+/** Pixels (RGBA) for a fake image: mostly `base`, with a block of `accent`. */
+function fakeImage(base, accent, size = 40) {
+	const data = new Uint8ClampedArray(size * size * 4);
+	for (let i = 0; i < size * size; i++) {
+		const [r, g, b] = i % size < size / 4 ? accent : base;
+		data.set([r, g, b, 255], i * 4);
+	}
+	return data;
+}
+
+test("theme from an image: readable in both modes, accent taken from the picture", () => {
+	const images = [
+		fakeImage([12, 18, 40], [255, 90, 160]), // navy with hot pink
+		fakeImage([240, 236, 220], [30, 140, 70]), // cream with green
+		fakeImage([90, 90, 90], [90, 90, 90]), // plain grey: no vivid colours at all
+	];
+	for (const data of images) {
+		const theme = themeFromPalette(extractPalette(data), "Test");
+		const s = sanitizeState({ customThemes: [{ id: "img", ...theme }] });
+		assert.equal(s.customThemes.length, 1, "valid, savable theme");
+		for (const mode of ["dark", "light"]) {
+			const m = theme[mode];
+			assert.ok(contrast(m.fg, m.bg) >= 7, `${mode} text ${contrast(m.fg, m.bg)}`);
+			assert.ok(contrast(m.accent, m.bg) >= 4.5, `${mode} accent ${contrast(m.accent, m.bg)}`);
+			assert.ok(contrast(m.accent2, m.bg) >= 3, `${mode} accent2`);
+		}
+	}
+	const pink = themeFromPalette(extractPalette(images[0]));
+	const hue = hexToOklch(pink.dark.accent).h;
+	assert.ok(hue > 320 || hue < 20, `accent keeps the pink hue (${hue})`);
+});
+
+test("Windows accent recolours the theme but never previews", () => {
+	const s = sanitizeState({ theme: { active: "nord" }, followWindows: { accent: true } });
+	const css = buildCss(s, { windowsAccent: "#680081" });
+	const fitted = withAccent(PRESETS.find((p) => p.id === "nord"), "#680081");
+	assert.ok(css.includes(`--dsw-static-deepseek-400:${fitted.dark.accent}`));
+	assert.ok(contrast(fitted.dark.accent, fitted.dark.bg) >= 4.5 && contrast(fitted.light.accent, fitted.light.bg) >= 4.5);
+	assert.ok(!buildCss(s, { windowsAccent: "#680081", previewTheme: PRESETS[0] }).includes(fitted.dark.accent), "previews show themes as they are");
+	assert.ok(buildCss(sanitizeState({ followWindows: { accent: true } }), { windowsAccent: "#680081" }).includes(withAccent(STOCK_THEME, "#680081").dark.accent), "stock theme too");
+});
+
+test("schedule: the latest slot that has started, wrapping past midnight, with a stable key", () => {
+	const entries = [{ time: "07:00", target: "theme:paper" }, { time: "19:30", target: "look:night" }];
+	const at = (h, m) => scheduleSlot(entries, new Date(2026, 9, 7, h, m));
+	assert.equal(at(8, 0).entry.target, "theme:paper");
+	assert.equal(at(19, 30).entry.target, "look:night");
+	assert.equal(at(2, 0).entry.target, "look:night", "before the first slot: yesterday's last one");
+	assert.equal(at(2, 0).key, "2026-10-06@19:30#look:night");
+	assert.equal(at(8, 0).key, at(18, 59).key, "same slot, same key");
+	assert.notEqual(at(18, 59).key, at(19, 30).key);
+	assert.equal(scheduleSlot([], new Date()), null);
+	const s = sanitizeState({ schedule: { enabled: true, entries: [{ time: "25:00", target: "theme:x" }, { time: "07:00", target: "rm -rf" }, { time: "09:15", target: "builtin:liquid-glass-desktop" }] } });
+	assert.deepEqual(s.schedule.entries, [{ time: "09:15", target: "builtin:liquid-glass-desktop" }]);
+});
+
+test("prompt placeholders: clipboard, date, labelled questions", () => {
+	const text = "Review {clipboard} for {ask:Audience} on {day}. Again: {ask:Audience}, {ask}, {ask:Tone}";
+	assert.deepEqual(promptPlaceholders(text), { clipboard: true, asks: ["Audience", "Answer", "Tone"] });
+	const filled = fillPrompt(text, { clipboard: "CODE", answers: { Audience: "juniors", Answer: "yes", Tone: "kind" }, now: new Date(2026, 9, 7), locale: "en-GB" });
+	assert.equal(filled, "Review CODE for juniors on Wednesday. Again: juniors, yes, kind");
+	assert.deepEqual(promptPlaceholders("plain {name} text"), { clipboard: false, asks: [] });
+	assert.equal(fillPrompt("{clipboard}{ask:X}"), "", "missing answers become empty, never 'undefined'");
+});
+
+test("usage summary: rolling windows, per-model totals, prices", () => {
+	const now = new Date(2026, 9, 7, 12, 0);
+	const day = 86_400_000;
+	const records = [
+		{ t: now.getTime() - 1000, m: "deepseek-chat", a: 1000, o: 500, r: 3000, w: 0 },
+		{ t: now.getTime() - 3 * day, m: "deepseek-chat", a: 2000, o: 100, r: 0, w: 1000 },
+		{ t: now.getTime() - 20 * day, m: "deepseek-reasoner", a: 100, o: 900, r: 0, w: 0 },
+		{ t: now.getTime() - 60 * day, m: "deepseek-chat", a: 1, o: 1, r: 0, w: 0 },
+	];
+	const prices = { "deepseek-chat": { input: 0.27, output: 1.1, cacheRead: 0.07 } };
+	const s = usageSummary(records, prices, now);
+	assert.deepEqual([s.today.calls, s.week.calls, s.month.calls, s.all.calls], [1, 2, 3, 4]);
+	assert.equal(s.today.tokens, 4500);
+	assert.equal(s.week.input, 4000, "cache writes count as input");
+	assert.equal(s.models["deepseek-chat"].calls, 3);
+	assert.ok(Math.abs(s.today.cost - (1000 * 0.27 + 500 * 1.1 + 3000 * 0.07) / 1e6) < 1e-12);
+	assert.equal(s.models["deepseek-chat"].priced, true);
+	assert.equal(s.models["deepseek-reasoner"].priced, false, "no price set");
+	assert.equal(s.month.priced, false);
+	assert.equal(s.days.length, 30);
+	assert.equal(s.days.at(-1).tokens, 4500);
+});
+
+test("usage recorder passes chunks through untouched and records the usage chunk", async () => {
+	const dir = mkdtempSync(join(tmpdir(), "studio-usage-"));
+	try {
+		const log = new UsageLog(join(dir, "usage.json"));
+		const listener = log.recorder();
+		const chunks = [{ type: "text", text: "hi" }, { type: "usage", usage: { inputTokens: 10, outputTokens: 5, cacheReadTokens: 90 } }, { type: "finish", reason: { kind: "stop" } }];
+		const seen = [];
+		for await (const c of listener({ provider: "deepseek", model: "deepseek-chat" }, () => (async function* () { yield* chunks; })())) seen.push(c);
+		assert.deepEqual(seen, chunks);
+		assert.equal(log.records.length, 1);
+		assert.deepEqual({ ...log.records[0], t: 0, d: 0 }, { t: 0, p: "deepseek", m: "deepseek-chat", a: 10, o: 5, r: 90, w: 0, d: 0, ok: true });
+		// A failing stream is recorded as failed and still throws to the harness.
+		const failing = listener({ provider: "deepseek", model: "x" }, () => (async function* () { yield { type: "text" }; throw new Error("boom"); })());
+		await assert.rejects(async () => { for await (const _ of failing) { /* drain */ } }, /boom/);
+		assert.equal(log.records.at(-1).ok, false);
+		log.flush();
+		assert.equal(new UsageLog(join(dir, "usage.json")).records.length, 2, "persists");
+	} finally {
+		rmSync(dir, { recursive: true, force: true });
+	}
+});
+
+test("settings sync: private gist, images stay local unless included, restore keeps local images", async () => {
+	const dir = mkdtempSync(join(tmpdir(), "studio-sync-"));
+	const realFetch = globalThis.fetch;
+	const calls = [];
+	let gist = null;
+	globalThis.fetch = async (url, init = {}) => {
+		calls.push({ url: String(url), method: init.method ?? "GET", headers: init.headers ?? {}, body: init.body });
+		const ok = (body) => ({ ok: true, status: 200, json: async () => body });
+		if (String(url).endsWith("/user")) return ok({ login: "RdotA" });
+		if (String(url).includes("/gists?")) return ok(gist ? [gist] : []);
+		if (init.method === "POST") { gist = { id: "abc123", description: JSON.parse(init.body).description, files: {} }; Object.assign(gist.files, Object.fromEntries(Object.entries(JSON.parse(init.body).files).map(([k, v]) => [k, { content: v.content }]))); return ok(gist); }
+		if (init.method === "PATCH") { Object.assign(gist.files, Object.fromEntries(Object.entries(JSON.parse(init.body).files).map(([k, v]) => [k, { content: v.content }]))); return ok(gist); }
+		return ok(gist);
+	};
+	try {
+		let state = sanitizeState({ wallpaper: { src: "data:image/jpeg;base64,AAAA" }, identity: { name: "RdotA" }, theme: { active: "dracula" } });
+		let restored = null;
+		const sync = new GistSync({ dataDir: dir, getState: () => state, setGistId: (id) => { state = sanitizeState(mergePatch(state, { sync: { gistId: id } })); }, restore: (s) => { restored = s; }, version: "2.0.0" });
+		await assert.rejects(sync.setToken("not-a-token"), /doesn't look like a GitHub token/);
+		await sync.setToken("ghp_" + "x".repeat(36));
+		assert.equal((await sync.status()).login, "RdotA");
+		await sync.push();
+		const create = calls.find((c) => c.method === "POST");
+		const sent = JSON.parse(create.body);
+		assert.equal(sent.public, false, "private gist");
+		const settings = JSON.parse(Object.values(sent.files)[0].content).settings;
+		assert.notEqual(settings.wallpaper.src, state.wallpaper.src, "uploaded images stay on this computer by default");
+		assert.equal(settings.cache, undefined);
+		assert.equal(state.sync.gistId, "abc123");
+		assert.ok(calls.every((c) => !String(c.url).includes("ghp_")), "token never in a URL");
+		// Restore on "another computer" keeps that computer's own wallpaper.
+		state = sanitizeState({ wallpaper: { src: "data:image/png;base64,BBBB" }, sync: { gistId: "abc123" } });
+		await sync.pull();
+		assert.equal(restored.theme.active, "dracula");
+		assert.equal(restored.wallpaper.src, "data:image/png;base64,BBBB");
+	} finally {
+		globalThis.fetch = realFetch;
+		rmSync(dir, { recursive: true, force: true });
+	}
+});
+
+test("languages: matching browser tags, every translation complete and consistent", () => {
+	assert.equal(matchLanguage(["zh-Hant-TW"]), "zh-TW");
+	assert.equal(matchLanguage(["zh-SG", "en"]), "zh-CN");
+	assert.equal(matchLanguage(["pt-PT"]), "pt-BR");
+	assert.equal(matchLanguage(["de-AT"]), "de");
+	assert.equal(matchLanguage(["xx", "ja-JP"]), "ja");
+	assert.equal(matchLanguage(["tlh"]), "en");
+	assert.equal(sanitizeState({ language: "fr" }).language, "fr");
+	assert.equal(sanitizeState({ language: "klingon" }).language, "auto");
+	assert.equal(LANGUAGES.find((l) => l.code === "ar").dir, "rtl");
+	const { problems, languages, keys } = checkLocales();
+	assert.deepEqual(problems, []);
+	assert.equal(languages, LANGUAGES.length);
+	assert.ok(keys > 500);
+});
+
+test("greeting speaks the chosen language; custom templates keep working", () => {
+	const dict = JSON.parse(readFileSync(new URL("../locales/ja.json", import.meta.url), "utf8"));
+	const ja = { tr: (k) => dict[k], locale: "ja" };
+	const morning = new Date(2026, 9, 7, 8, 0);
+	assert.equal(renderGreeting(sanitizeState({ identity: { name: "RdotA" } }), morning, ja), "おはようございます、RdotAさん");
+	assert.equal(renderGreeting(sanitizeState({}), morning, ja), "おはようございます");
+	assert.equal(renderGreeting(sanitizeState({ identity: { name: "RdotA", greetingTemplate: "{timeOfDay}だね、{name}" } }), morning, ja), "朝だね、RdotA");
+	const css = buildCss(sanitizeState({ identity: { greeting: true, name: "RdotA" } }), { now: morning, greetingLang: ja });
+	assert.ok(css.includes('content:"おはようございます、RdotAさん"'));
+});
+
+test("gallery themes are validated and the shipped gallery is readable", () => {
+	assert.equal(cleanGalleryTheme({ id: "../x", dark: {}, light: {} }), null);
+	const t = cleanGalleryTheme({ id: "ok", name: "OK", author: "RdotA", dark: { bg: "#000", fg: "#fff", accent: "#0af" }, light: { bg: "#fff", fg: "#000", accent: "#05a" }, extra: "dropped" });
+	assert.deepEqual(Object.keys(t).sort(), ["author", "dark", "description", "emoji", "id", "light", "name"]);
+	const index = JSON.parse(readFileSync(new URL("../gallery/index.json", import.meta.url), "utf8"));
+	assert.ok(index.themes.length >= 8);
+	for (const theme of index.themes) {
+		assert.deepEqual(cleanGalleryTheme(theme), theme, theme.id);
+		for (const mode of ["dark", "light"]) {
+			assert.ok(contrast(theme[mode].fg, theme[mode].bg) >= 7, `${theme.id} ${mode} text`);
+			assert.ok(contrast(theme[mode].accent, theme[mode].bg) >= 3, `${theme.id} ${mode} accent`);
+		}
+	}
+});
+
+test("layout: chat width and interface scale", () => {
+	const css = buildCss(sanitizeState({ layout: { chatWidth: "wide", scale: 115 } }));
+	assert.ok(css.includes("--dsh-chat-user-width:1100px"));
+	assert.ok(css.includes("html:root body>#root{zoom:1.15}"));
+	assert.ok(!buildCss(defaultState()).includes("zoom"));
+	assert.equal(sanitizeState({ layout: { scale: 500, chatWidth: "huge" } }).layout.scale, 140);
+	assert.equal(sanitizeState({ layout: { chatWidth: "huge" } }).layout.chatWidth, "default");
+});
+
+for (const run of pending) await run();
 console.log(`\n${passed} passed${process.exitCode ? ", some FAILED" : ""}`);

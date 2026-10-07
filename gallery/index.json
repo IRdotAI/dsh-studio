@@ -1,0 +1,141 @@
+{
+	"version": 1,
+	"themes": [
+		{
+			"id": "aurora",
+			"name": "Aurora",
+			"emoji": "🌌",
+			"author": "RdotA",
+			"description": "Northern lights over a polar night: teal glow on deep indigo.",
+			"dark": {
+				"bg": "#0b1020",
+				"fg": "#e6f0ff",
+				"accent": "#5eead4"
+			},
+			"light": {
+				"bg": "#f3f8ff",
+				"fg": "#0b1020",
+				"accent": "#0f766e"
+			}
+		},
+		{
+			"id": "deep-space",
+			"name": "Deep Space",
+			"emoji": "🪐",
+			"author": "RdotA",
+			"description": "Starlight periwinkle on the darkest void.",
+			"dark": {
+				"bg": "#05060f",
+				"fg": "#dfe6ff",
+				"accent": "#7c8cff"
+			},
+			"light": {
+				"bg": "#f5f7ff",
+				"fg": "#10142b",
+				"accent": "#3949ab"
+			}
+		},
+		{
+			"id": "lavender-fields",
+			"name": "Lavender Fields",
+			"emoji": "💜",
+			"author": "RdotA",
+			"description": "Soft lilac rows under a calm evening.",
+			"dark": {
+				"bg": "#16131f",
+				"fg": "#ece8ff",
+				"accent": "#b69cff"
+			},
+			"light": {
+				"bg": "#f7f5ff",
+				"fg": "#1e1830",
+				"accent": "#6d28d9"
+			}
+		},
+		{
+			"id": "matcha",
+			"name": "Matcha",
+			"emoji": "🍵",
+			"author": "RdotA",
+			"description": "Whisked green tea and warm oat milk.",
+			"dark": {
+				"bg": "#141a14",
+				"fg": "#e7efe1",
+				"accent": "#a3d977"
+			},
+			"light": {
+				"bg": "#f4f7ee",
+				"fg": "#1f2a1c",
+				"accent": "#4d7c0f"
+			}
+		},
+		{
+			"id": "mocha-mousse",
+			"name": "Mocha Mousse",
+			"emoji": "🍫",
+			"author": "RdotA",
+			"description": "Creamy cocoa browns with a dusty rose finish.",
+			"dark": {
+				"bg": "#1c1512",
+				"fg": "#f3e9e2",
+				"accent": "#c79a7e"
+			},
+			"light": {
+				"bg": "#faf5f1",
+				"fg": "#2b1e18",
+				"accent": "#8b5e44"
+			}
+		},
+		{
+			"id": "night-city",
+			"name": "Night City",
+			"emoji": "🌃",
+			"author": "RdotA",
+			"description": "Cyberpunk yellow on rain-slick black.",
+			"dark": {
+				"bg": "#0a0a12",
+				"fg": "#f0f0ff",
+				"accent": "#fcee0a"
+			},
+			"light": {
+				"bg": "#fffde6",
+				"fg": "#111018",
+				"accent": "#7a6100"
+			}
+		},
+		{
+			"id": "sunset-boulevard",
+			"name": "Sunset Boulevard",
+			"emoji": "🌇",
+			"author": "RdotA",
+			"description": "Golden-hour coral over a dusky violet sky.",
+			"dark": {
+				"bg": "#1a1020",
+				"fg": "#ffe9e0",
+				"accent": "#ff7a59"
+			},
+			"light": {
+				"bg": "#fff5ef",
+				"fg": "#2a1410",
+				"accent": "#c2410c"
+			}
+		},
+		{
+			"id": "terminal",
+			"name": "Terminal",
+			"emoji": "📟",
+			"author": "RdotA",
+			"description": "Phosphor green, straight from a 1983 mainframe.",
+			"dark": {
+				"bg": "#0b0f0b",
+				"fg": "#c8facc",
+				"accent": "#39ff14"
+			},
+			"light": {
+				"bg": "#f2fff2",
+				"fg": "#0b2a0b",
+				"accent": "#15803d"
+			}
+		}
+	]
+}

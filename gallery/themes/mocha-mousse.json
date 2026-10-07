@@ -1,0 +1,17 @@
+{
+  "id": "mocha-mousse",
+  "name": "Mocha Mousse",
+  "emoji": "🍫",
+  "author": "RdotA",
+  "description": "Creamy cocoa browns with a dusty rose finish.",
+  "dark": {
+    "bg": "#1c1512",
+    "fg": "#f3e9e2",
+    "accent": "#c79a7e"
+  },
+  "light": {
+    "bg": "#faf5f1",
+    "fg": "#2b1e18",
+    "accent": "#8b5e44"
+  }
+}

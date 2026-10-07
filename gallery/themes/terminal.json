@@ -1,0 +1,17 @@
+{
+  "id": "terminal",
+  "name": "Terminal",
+  "emoji": "📟",
+  "author": "RdotA",
+  "description": "Phosphor green, straight from a 1983 mainframe.",
+  "dark": {
+    "bg": "#0b0f0b",
+    "fg": "#c8facc",
+    "accent": "#39ff14"
+  },
+  "light": {
+    "bg": "#f2fff2",
+    "fg": "#0b2a0b",
+    "accent": "#15803d"
+  }
+}

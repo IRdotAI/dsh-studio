@@ -1,0 +1,17 @@
+{
+  "id": "sunset-boulevard",
+  "name": "Sunset Boulevard",
+  "emoji": "🌇",
+  "author": "RdotA",
+  "description": "Golden-hour coral over a dusky violet sky.",
+  "dark": {
+    "bg": "#1a1020",
+    "fg": "#ffe9e0",
+    "accent": "#ff7a59"
+  },
+  "light": {
+    "bg": "#fff5ef",
+    "fg": "#2a1410",
+    "accent": "#c2410c"
+  }
+}

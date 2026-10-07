@@ -1,0 +1,17 @@
+{
+  "id": "lavender-fields",
+  "name": "Lavender Fields",
+  "emoji": "💜",
+  "author": "RdotA",
+  "description": "Soft lilac rows under a calm evening.",
+  "dark": {
+    "bg": "#16131f",
+    "fg": "#ece8ff",
+    "accent": "#b69cff"
+  },
+  "light": {
+    "bg": "#f7f5ff",
+    "fg": "#1e1830",
+    "accent": "#6d28d9"
+  }
+}
