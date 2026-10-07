@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import {
 	PRESETS, themeTokens, contrast, hexToOklch, oklchToHex, normHex, sanitizeState, defaultState, mergePatch,
-	buildCss, personaPrompt, renderGreeting, randomTheme, resolveTheme, CSS_MARKER, LOOKS,
+	buildCss, personaPrompt, renderGreeting, randomTheme, resolveTheme, CSS_MARKER, LOOKS, parseVersion, compareVersions,
 } from "../lib/shared.js";
 
 let passed = 0;
@@ -155,6 +155,22 @@ test("an image logo without an image falls back to the original logo", () => {
 	// What the × button sends: back to the original, image gone.
 	const removed = sanitizeState(mergePatch({ identity: kept }, { identity: { mark: "default", markImage: "" } })).identity;
 	assert.deepEqual([removed.mark, removed.markImage], ["default", ""]);
+});
+
+test("version ordering for updates and downgrades", () => {
+	assert.deepEqual(parseVersion("v1.2.3"), { major: 1, minor: 2, patch: 3, pre: "" });
+	assert.equal(parseVersion("latest"), null);
+	assert.ok(compareVersions("1.3.0", "1.2.9") > 0);
+	assert.ok(compareVersions("v1.10.0", "1.9.9") > 0, "numeric, not alphabetical");
+	assert.ok(compareVersions("1.2.0", "1.2.0") === 0);
+	assert.ok(compareVersions("1.3.0-beta.1", "1.3.0") < 0, "a pre-release sorts below its release");
+	assert.ok(compareVersions("1.3.0-beta.2", "1.3.0-beta.1") > 0);
+	assert.ok(compareVersions("garbage", "0.0.1") < 0);
+	const sorted = ["1.1.0", "1.3.0", "1.2.0", "1.3.0-rc.1"].sort((a, b) => compareVersions(b, a));
+	assert.deepEqual(sorted, ["1.3.0", "1.3.0-rc.1", "1.2.0", "1.1.0"]);
+	assert.equal(sanitizeState({}).updates.auto, false);
+	assert.equal(sanitizeState({ updates: { auto: true } }).updates.auto, true);
+	assert.equal(sanitizeState({ updates: { auto: "yes" } }).updates.auto, false);
 });
 
 test("greeting drops the dangling comma when no name is set", () => {

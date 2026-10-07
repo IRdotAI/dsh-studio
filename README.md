@@ -30,7 +30,21 @@ npx @deepseek-ai/dsh plugin --profile web add github:IRdotAI/dsh-studio
 
 Then restart `dsh web`. A **Studio** entry appears in the sidebar. Requires DSH 0.2 (tested with 0.2.0-rc.2), the web profile, and Node 22.5+. `pnpm` must be on your PATH for plugin installs (`npm install -g pnpm`).
 
-To update, run the same `add` command again. To remove it, use **Uninstall** on its Plugins page entry.
+To remove it, use **Uninstall** on its Plugins page entry.
+
+## Updates
+
+From v1.3.0, Studio updates itself from this repo's [releases](https://github.com/IRdotAI/dsh-studio/releases):
+
+- When a new version is out, a banner at the top of Studio (and a dot on its sidebar icon) offers **Update now**, **Turn on auto-updates** and **What's new**.
+- **Studio → Updates** lists every release. **Update** to a newer one, **Reinstall** the current one, or **Downgrade** to an older one if a new version gives you trouble.
+- With **auto-updates** on, Studio checks GitHub every 6 hours and installs new versions by itself.
+- Installs go through DeepSeek Harness's own plugin manager (the same as Plugins → Add plugin) and take effect the next time you restart DeepSeek Harness.
+- Your settings are backed up before every install (`~/.dsh/studio/studio.backup-*.json`, newest five kept).
+- Downgrading switches auto-updates off, so Studio doesn't jump straight back.
+- Versions before 1.3.0 don't have the Updates page; to come back from one, use Plugins → Add plugin → `github:IRdotAI/dsh-studio` again.
+
+One-click updates need Studio to have been installed from GitHub. A copy linked from a local folder (a developer install) says so on the Updates page and updates from that folder instead.
 
 ## Using it
 
@@ -52,6 +66,7 @@ To update, run the same `add` command again. To remove it, use **Uninstall** on 
 | **AI preferences** | Optional custom instructions: your name, about you, a response style (Concise, Thorough, Friendly, Mentor, Butler, Hype), reply language and free-form instructions. **Off by default**; the tab shows exactly what the model will receive. |
 | **Saved prompts** | Six starters; add, edit and reorder your own. They're inserted at your cursor. |
 | **Advanced** | Custom CSS (applied last; use the `--dsw-*` design tokens), export/import settings as JSON, reset. |
+| **Updates** | Update banner and sidebar dot when a new version is out, optional auto-updates, and every release listed for updating, reinstalling or downgrading. |
 | **Credits** | Who made Studio, what it builds on, and where each adapted theme palette comes from. |
 
 ## Privacy
@@ -70,6 +85,7 @@ Theming works by re-deriving DSH's three static colour scales (`--dsw-static-neu
 | --- | --- |
 | `lib/shared.js` | Pure core: colour maths, presets, palette generation, stylesheet builder, settings validation, persona text. Shared by both halves. |
 | `lib/index.js` | Host half: settings file, API routes, first-paint stylesheet, desktop wallpaper and font serving, system-prompt section. |
+| `lib/updater.js` | Host half: finds releases on GitHub and installs updates or downgrades through the harness plugin manager. |
 | `src/client.js` | Browser half source: Studio page, quick switcher, composer button, slash commands, brand slots, glass-surface discovery. |
 | `lib/client.js` | **Generated** browser bundle. Edit `src/client.js` or `lib/shared.js`, then run `node scripts/build.mjs`. |
 
@@ -83,6 +99,7 @@ All routes are behind DSH's own browser authentication.
 - `POST /api/studio/reset` with `{"confirm":"reset-studio"}`
 - `GET /api/studio/desktop-wallpaper`: the current Windows wallpaper
 - `GET /api/studio/font?f=<file>`: a file from the configured font folder (only files in that folder are served)
+- `GET /api/studio/updates`: version, releases and update status; `POST` it `{"action":"check"}` or `{"action":"install","version":"x.y.z"}`
 
 ## Development
 
@@ -90,7 +107,7 @@ All routes are behind DSH's own browser authentication.
 git clone https://github.com/IRdotAI/dsh-studio
 cd dsh-studio
 node scripts/build.mjs     # rebuild lib/client.js
-node test/selftest.mjs     # 17 checks
+node test/selftest.mjs     # 18 checks
 npx @deepseek-ai/dsh plugin --profile web add "$PWD"   # install your local copy
 ```
 

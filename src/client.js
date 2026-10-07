@@ -111,6 +111,18 @@ textarea.st_input{resize:vertical;min-height:96px;line-height:1.5}
 .st_link{color:var(--dsw-alias-link,var(--dsw-alias-state-business-primary));text-decoration:none;font-size:13px;white-space:nowrap}
 .st_link:hover{text-decoration:underline}
 a.st_btn{text-decoration:none}
+.st_updateIcon{font-size:24px;line-height:1;flex:none;display:inline-block}
+.st_spin{animation:st_spin 1.1s linear infinite}
+@keyframes st_spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){.st_spin{animation:none}}
+.st_relRow{display:flex;flex-direction:column;gap:8px;padding:10px 0;border-bottom:.5px solid var(--dsw-alias-border-l2)}
+.st_relRow:last-child{border-bottom:0}
+.st_relHead{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.st_relVersion{font-family:var(--ds-font-family-code);font-size:13px;font-weight:600;min-width:64px}
+.st_relConfirm{display:flex;flex-direction:column;gap:8px;padding:12px 14px;border-radius:var(--dsw-radius-sm);border:.5px solid color-mix(in srgb,var(--dsw-alias-state-error-primary) 45%,transparent);background:color-mix(in srgb,var(--dsw-alias-state-error-primary) 8%,transparent)}
+.st_badge_accent{background:color-mix(in srgb,var(--dsw-alias-state-business-primary) 18%,transparent);color:var(--dsw-alias-state-business-primary)}
+.st_navIcon{position:relative;display:inline-flex}
+.st_navDot{position:absolute;top:-3px;right:-4px;width:7px;height:7px;border-radius:50%;corner-shape:round;background:var(--dsw-alias-state-business-primary);box-shadow:0 0 0 1.5px var(--dsw-specific-sidebar-fill)}
 .st_markThumb{position:relative;width:56px;height:56px;flex:none}
 .st_markThumb img{width:56px;height:56px;border-radius:24%;object-fit:cover;border:.5px solid var(--dsw-alias-border-l4);display:block}
 .st_markRemove{position:absolute;top:-8px;right:-8px;width:22px;height:22px;padding:0;border-radius:50%;corner-shape:round;display:inline-flex;align-items:center;justify-content:center;font:inherit;font-size:15px;line-height:1;color:var(--dsw-alias-label-primary);background:var(--dsw-alias-bg-layer-3);border:.5px solid var(--dsw-alias-border-l4);box-shadow:0 2px 6px rgba(0,0,0,.3);cursor:pointer}
@@ -163,6 +175,8 @@ let snapshot = {
 	toast: null,
 	/** What the host machine offers: { desktopWallpaper: boolean, fontFaces: [{ url, weight, style }] }. */
 	env: { desktopWallpaper: false, fontFaces: [] },
+	/** The host updater's snapshot (version, releases, status), or null until first loaded. */
+	updates: null,
 };
 const listeners = new Set();
 
@@ -233,6 +247,46 @@ async function load() {
 		setSnap({ state: sanitizeState(res.state), loaded: true, error: null, ...(res.env ? { env: res.env } : {}) });
 	} catch (e) {
 		setSnap({ loaded: true, error: "Couldn't load your Studio settings (is the dsh-studio host plugin enabled?): " + errorText(e) });
+	}
+}
+
+async function loadUpdates() {
+	try {
+		const updates = await apiGet("updates");
+		setSnap({ updates });
+		const done = updates.justUpdated;
+		if (done) {
+			const key = `dsh-studio:announced:${done.to}`;
+			let announced = false;
+			try { announced = localStorage.getItem(key) === "1"; localStorage.setItem(key, "1"); } catch { /* storage blocked */ }
+			if (!announced) toast(`Studio ${compareVersions(done.to, done.from) < 0 ? "downgraded" : "updated"} to v${done.to}`);
+		}
+	} catch { /* older host or offline: the Updates tab says so */ }
+}
+
+async function checkForUpdates() {
+	try {
+		setSnap({ updates: await apiPost("updates", { action: "check" }) });
+	} catch (e) {
+		toast(errorText(e));
+		void loadUpdates();
+	}
+}
+
+/** Auto-update on/off; turning it on makes the host check (and maybe install) right away. */
+function setAutoUpdates(on) {
+	update({ updates: { auto: on } });
+	toast(on ? "Auto-updates on" : "Auto-updates off");
+	for (const ms of [1500, 6000]) setTimeout(loadUpdates, ms);
+}
+
+async function installVersion(version) {
+	try {
+		setSnap({ updates: await apiPost("updates", { action: "install", version }) });
+		toast(`Installing Studio v${version}…`);
+	} catch (e) {
+		toast(errorText(e));
+		void loadUpdates();
 	}
 }
 
@@ -1097,6 +1151,123 @@ function AdvancedTab() {
 	];
 }
 
+//#region updates UI
+const shortDate = (iso) => (iso ? new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "");
+
+function sinceText(ts) {
+	if (!ts) return "never";
+	const mins = Math.round((Date.now() - ts) / 60000);
+	if (mins < 1) return "just now";
+	if (mins < 60) return `${mins} min ago`;
+	const hours = Math.round(mins / 60);
+	return hours < 48 ? `${hours} h ago` : `${Math.round(hours / 24)} days ago`;
+}
+
+/** Why the one-click buttons are unavailable, in words. */
+function blockerText(u) {
+	const add = `Plugins → Add plugin → github:${u.repo ?? "IRdotAI/dsh-studio"}`;
+	switch (u.blocker) {
+		case "local-copy": return `This copy of Studio is linked from a folder on this computer (a developer install), so its updates come from that folder. For one-click updates, install it from GitHub: ${add}.`;
+		case "not-from-github": return `This copy wasn't installed from GitHub, so it can't update itself. Reinstall it from GitHub: ${add}.`;
+		case "no-plugin-manager": return "This harness doesn't let plugins use its plugin manager, so update from the Plugins page instead.";
+		case "no-repository": return "This copy doesn't say where its releases live, so it can't check for updates.";
+		default: return null;
+	}
+}
+
+/** Shown at the top of every Studio tab while there's something to say about updates. */
+function UpdateBanner() {
+	const u = useSnap((s) => s.updates);
+	const state = useSnap((s) => s.state);
+	if (!u) return null;
+	let body = null;
+	if (u.status === "installing" && u.installing) {
+		body = [h("span", { key: "i", className: "st_updateIcon st_spin", "aria-hidden": true }, "⟳"), h("div", { key: "t", className: "st_lookText" }, h("div", { className: "st_lookTitle" }, `Installing Studio v${u.installing.version}…`), h("div", { className: "st_lookDesc" }, "This takes a few seconds. Your settings were backed up first."))];
+	} else if (u.restartTo) {
+		body = [h("span", { key: "i", className: "st_updateIcon", "aria-hidden": true }, "✅"), h("div", { key: "t", className: "st_lookText" }, h("div", { className: "st_lookTitle" }, `Studio v${u.restartTo} is installed`), h("div", { className: "st_lookDesc" }, "Restart DeepSeek Harness to finish: close the app and open it again, or stop dsh web and run it again."))];
+	} else if (u.updateAvailable && !u.blocker) {
+		body = [
+			h("span", { key: "i", className: "st_updateIcon", "aria-hidden": true }, "✨"),
+			h("div", { key: "t", className: "st_lookText" }, h("div", { className: "st_lookTitle" }, `Studio v${u.latest} is available`), h("div", { className: "st_lookDesc" }, `You have v${u.current}.`)),
+			h("div", { key: "a", className: "st_actions" },
+				h(Button, { kind: "primary", onClick: () => void installVersion(u.latest) }, "Update now"),
+				state.updates.auto ? null : h(Button, { onClick: () => setAutoUpdates(true) }, "Turn on auto-updates"),
+				h(Button, { onClick: () => setSnap({ tab: "updates" }) }, "What's new")),
+		];
+	}
+	return body ? h("div", { className: "st_look", role: "status" }, body) : null;
+}
+
+function ReleaseRow({ release, u }) {
+	const [open, setOpen] = useState(false);
+	const [confirming, setConfirming] = useState(false);
+	const order = compareVersions(release.version, u.current);
+	const busy = u.status === "installing";
+	const label = order > 0 ? "Update" : order === 0 ? "Reinstall" : "Downgrade";
+	const preUpdater = compareVersions(release.version, UPDATER_SINCE) < 0;
+	return h("div", { className: "st_relRow" },
+		h("div", { className: "st_relHead" },
+			h("span", { className: "st_relVersion" }, "v" + release.version),
+			release.version === u.latest ? h("span", { className: "st_badge st_badge_ok" }, "Latest") : null,
+			order === 0 ? h("span", { className: "st_badge st_badge_accent" }, "Installed") : null,
+			release.prerelease ? h("span", { className: "st_badge st_badge_warn" }, "Pre-release") : null,
+			h("span", { className: "st_hint", style: { flex: 1 } }, shortDate(release.publishedAt)),
+			release.notes ? h(Button, { small: true, onClick: () => setOpen(!open) }, open ? "Hide notes" : "What's new") : null,
+			u.blocker ? null : h(Button, {
+				small: true, kind: order > 0 ? "primary" : undefined, disabled: busy,
+				onClick: () => (order < 0 ? setConfirming(true) : void installVersion(release.version)),
+			}, label)),
+		confirming
+			? h("div", { className: "st_relConfirm" },
+				h("p", { className: "st_creditLine" }, `Downgrade to v${release.version}? Auto-updates switch off so Studio doesn't jump straight back. Your settings are backed up first; anything the older version doesn't know about is dropped from its settings.`),
+				preUpdater ? h("p", { className: "st_creditLine" }, `v${release.version} doesn't have this Updates page. To come back to the latest version later, use ${`Plugins → Add plugin → github:${u.repo}`}.`) : null,
+				h("div", { className: "st_actions" },
+					h(Button, { kind: "danger", disabled: busy, onClick: () => { setConfirming(false); void installVersion(release.version); } }, `Yes, downgrade to v${release.version}`),
+					h(Button, { onClick: () => setConfirming(false) }, "Cancel")))
+			: null,
+		open ? h("pre", { className: "st_pre" }, release.notes) : null,
+	);
+}
+
+function UpdatesTab() {
+	const u = useSnap((s) => s.updates);
+	const auto = useSnap((s) => s.state.updates.auto);
+	if (!u) return h(Section, { title: "Updates" }, h("p", { className: "st_hint" }, "Couldn't reach Studio's updater. Restart DeepSeek Harness, then try again."));
+	const blocked = blockerText(u);
+	return [
+		h(Section, {
+			key: "status",
+			title: `Studio v${u.current}`,
+			description: u.repo ? `Updates come from github.com/${u.repo} releases.` : undefined,
+			actions: h(Button, { disabled: u.status !== "idle", onClick: () => void checkForUpdates() }, u.status === "checking" ? "Checking…" : "Check for updates"),
+		},
+			blocked ? h("p", { className: "st_creditLine" }, blocked) : null,
+			h(Toggle, {
+				checked: auto && !u.blocker,
+				onChange: setAutoUpdates,
+				label: "Install updates automatically",
+				hint: u.blocker ? "Unavailable for this copy (see above)." : "Studio checks GitHub every 6 hours and installs new versions by itself; they take effect when you next restart DeepSeek Harness.",
+			}),
+			h("span", { className: "st_hint" },
+				u.error ? u.error : u.updateAvailable ? `v${u.latest} is available.` : u.releases.length ? "You're up to date." : "No releases found yet.",
+				` Last checked ${sinceText(u.lastCheck)}.`),
+		),
+		h(Section, { key: "versions", title: "All versions", description: "Install any release: update to a newer one, reinstall this one, or downgrade if a new version gives you trouble." },
+			u.releases.length
+				? h("div", null, u.releases.map((r) => h(ReleaseRow, { key: r.tag, release: r, u })))
+				: h("p", { className: "st_hint" }, "Nothing here yet. Press Check for updates."),
+		),
+	];
+}
+
+/** The sidebar entry's icon, with a dot while an update is waiting. */
+function StudioNavIcon(props) {
+	const u = useSnap((s) => s.updates);
+	const dot = Boolean(u && ((u.updateAvailable && !u.blocker) || u.restartTo));
+	return h("span", { className: "st_navIcon" }, h(PaletteIcon, props), dot ? h("span", { className: "st_navDot", "aria-label": "Studio update available" }) : null);
+}
+//#endregion
+
 const STUDIO_VERSION = "__STUDIO_VERSION__"; // filled in from package.json by scripts/build.mjs
 const REPO_URL = "https://github.com/IRdotAI/dsh-studio";
 
@@ -1154,6 +1325,7 @@ const TABS = [
 	{ id: "persona", label: "AI preferences", component: PersonaTab },
 	{ id: "prompts", label: "Prompts", component: PromptsTab },
 	{ id: "advanced", label: "Advanced", component: AdvancedTab },
+	{ id: "updates", label: "Updates", component: UpdatesTab },
 	{ id: "credits", label: "Credits", component: CreditsTab },
 ];
 
@@ -1170,6 +1342,7 @@ function StudioPage() {
 					h("p", { className: "st_sub" }, "Themes, style and personal touches for your harness. ", h("span", { className: "st_kbd" }, "Ctrl K"), " opens the quick switcher anywhere."),
 				),
 			),
+			h(UpdateBanner),
 			h("div", { className: "st_tabs", role: "tablist" },
 				TABS.map((t) => h("button", { key: t.id, type: "button", role: "tab", className: "st_tab", "aria-selected": t.id === current.id, onClick: () => setSnap({ tab: t.id }) }, t.label))),
 			error ? h("div", { className: "st_banner" }, error) : null,
@@ -1217,6 +1390,9 @@ function paletteItems(state) {
 		run: () => { update({ persona: { enabled: !state.persona.enabled } }); toast(state.persona.enabled ? "Preferences off" : "Preferences on"); },
 	});
 	if (services.layout) items.push({ id: "sidebar", group: "Layout", icon: "◧", label: "Toggle sidebar", run: () => services.layout.toggleSidebar() });
+	const u = snapshot.updates;
+	if (u?.updateAvailable && !u.blocker) items.push({ id: "update-now", group: "Updates", icon: "✨", label: `Update Studio to v${u.latest}`, run: () => void installVersion(u.latest) });
+	items.push({ id: "update-check", group: "Updates", icon: "⟳", label: "Check for Studio updates", hint: u ? `v${u.current}` : "", run: () => { void checkForUpdates(); openStudio("updates"); } });
 	for (const t of TABS) items.push({ id: "open:" + t.id, group: "Studio", icon: "🎨", label: "Open " + t.label, run: () => openStudio(t.id) });
 	return items;
 }
@@ -1562,7 +1738,21 @@ function apply(ctx) {
 	}, "dsh-studio: glass surface discovery");
 
 	ctx.slots.inject("main", () => ctx.slots.register({ name: "main", key: PANEL_ID }, StudioPage));
-	ctx.slots.inject("sidebar.panellist", () => ctx.slots.register({ name: "sidebar.panellist", id: PANEL_ID, order: 6, label: "Studio" }, PaletteIcon));
+	ctx.slots.inject("sidebar.panellist", () => ctx.slots.register({ name: "sidebar.panellist", id: PANEL_ID, order: 6, label: "Studio" }, StudioNavIcon));
+
+	ctx.effect(() => {
+		void loadUpdates();
+		const afterHostCheck = setTimeout(loadUpdates, 20 * 1000); // the host's first check runs ~15 s after startup
+		const busyPoll = setInterval(() => {
+			if (snapshot.updates && snapshot.updates.status !== "idle") void loadUpdates();
+		}, 1500);
+		const slowPoll = setInterval(loadUpdates, 10 * 60 * 1000);
+		return () => {
+			clearTimeout(afterHostCheck);
+			clearInterval(busyPoll);
+			clearInterval(slowPoll);
+		};
+	}, "dsh-studio: update status");
 	ctx.slots.inject("shell.overlay", () => ctx.slots.register({ name: "shell.overlay", id: "dsh-studio-palette" }, CommandPalette));
 	ctx.slots.inject("conversation.input.left", () => ctx.slots.register({ name: "conversation.input.left", id: "dsh-studio-prompts", order: 90 }, PromptsButton));
 	installBrandSync(ctx);
