@@ -172,8 +172,8 @@ function ThemeCard({ choice, active, onPick, footer }) {
 				h("span", { className: "st_cardName" }, choice.name),
 				active ? h("span", { className: "st_cardCheck" }, t("themes.active")) : null,
 			),
+			footer ?? null,
 		),
-		footer ?? null,
 	);
 }
 

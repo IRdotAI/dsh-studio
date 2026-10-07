@@ -401,6 +401,7 @@
 	"usage.month": "30 ngày qua",
 	"usage.all": "Toàn thời gian",
 	"usage.calls": "lần gọi",
+	"usage.callsHeader": "Lần gọi",
 	"usage.tokens": "token",
 	"usage.noPrices": "hãy thêm giá bên dưới",
 	"usage.chartLabel": "Token mỗi ngày trong 30 ngày qua",

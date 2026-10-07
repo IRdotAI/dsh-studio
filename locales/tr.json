@@ -401,6 +401,7 @@
 	"usage.month": "Son 30 gün",
 	"usage.all": "Tüm zamanlar",
 	"usage.calls": "çağrı",
+	"usage.callsHeader": "Çağrılar",
 	"usage.tokens": "token",
 	"usage.noPrices": "aşağıya fiyat ekleyin",
 	"usage.chartLabel": "Son 30 günde günlük token",

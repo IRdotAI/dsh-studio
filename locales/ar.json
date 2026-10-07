@@ -401,6 +401,7 @@
 	"usage.month": "آخر 30 يومًا",
 	"usage.all": "منذ البداية",
 	"usage.calls": "استدعاء",
+	"usage.callsHeader": "الاستدعاءات",
 	"usage.tokens": "رمز",
 	"usage.noPrices": "أضف الأسعار أدناه",
 	"usage.chartLabel": "الرموز يوميًا خلال آخر 30 يومًا",

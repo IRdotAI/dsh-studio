@@ -401,6 +401,7 @@
 	"usage.month": "30 derniers jours",
 	"usage.all": "Depuis le début",
 	"usage.calls": "appels",
+	"usage.callsHeader": "Appels",
 	"usage.tokens": "tokens",
 	"usage.noPrices": "ajoutez les prix ci-dessous",
 	"usage.chartLabel": "Tokens par jour sur les 30 derniers jours",

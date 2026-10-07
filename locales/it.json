@@ -401,6 +401,7 @@
 	"usage.month": "Ultimi 30 giorni",
 	"usage.all": "Da sempre",
 	"usage.calls": "chiamate",
+	"usage.callsHeader": "Chiamate",
 	"usage.tokens": "token",
 	"usage.noPrices": "aggiungi i prezzi qui sotto",
 	"usage.chartLabel": "Token al giorno negli ultimi 30 giorni",

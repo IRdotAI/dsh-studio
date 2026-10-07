@@ -401,6 +401,7 @@
 	"usage.month": "Ostatnie 30 dni",
 	"usage.all": "Od początku",
 	"usage.calls": "wywołań",
+	"usage.callsHeader": "Wywołania",
 	"usage.tokens": "tokenów",
 	"usage.noPrices": "dodaj ceny poniżej",
 	"usage.chartLabel": "Tokeny dziennie w ostatnich 30 dniach",

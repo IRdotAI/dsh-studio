@@ -10,9 +10,13 @@ Zero npm dependencies. Your settings stay on your machine unless you turn on syn
 | --- | --- | --- |
 | ![Frosted-glass composer over a wallpaper, greeting "Good night, RdotA"](docs/screenshots/greeting.jpg) | ![Ctrl+K quick switcher previewing Tokyo Night](docs/screenshots/quick-switcher.jpg) | ![Theme editor](docs/screenshots/theme-editor.jpg) |
 
-| Saved prompts | Light mode (Synthwave) | Credits |
+| Community gallery | Usage & cost (sample data) | Looks & schedule, in Japanese |
 | --- | --- | --- |
-| ![Saved prompts menu beside the composer](docs/screenshots/saved-prompts.jpg) | ![Studio themes page in light mode](docs/screenshots/themes-light.jpg) | ![Credits page](docs/screenshots/credits.jpg) |
+| ![Gallery tab with community themes and their authors](docs/screenshots/gallery.jpg) | ![Usage tab: totals, 30-day chart and per-model prices](docs/screenshots/usage.jpg) | ![Saved looks and a time-of-day schedule, interface in Japanese](docs/screenshots/looks-schedule-ja.jpg) |
+
+| Prompts that ask first | Saved prompts | Light mode (Synthwave) |
+| --- | --- | --- |
+| ![A saved prompt asking for Topic and Audience before inserting](docs/screenshots/prompt-questions.jpg) | ![Saved prompts menu beside the composer](docs/screenshots/saved-prompts.jpg) | ![Studio themes page in light mode](docs/screenshots/themes-light.jpg) |
 
 ## Install
 
@@ -151,6 +155,8 @@ Restart `dsh web` after changing anything under `lib/` (host modules are cached)
 ## Credits
 
 Made by **RdotA**. Theme palettes adapted from Dracula, Nord, Catppuccin, Gruvbox, Solarized, Tokyo Night and Rosé Pine. Full credits, with links, are in [CREDITS.md](CREDITS.md) and in the app under **Studio → Credits**.
+
+<img src="docs/screenshots/credits.jpg" alt="Studio's Credits page" width="400">
 
 ## Licence
 

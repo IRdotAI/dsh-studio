@@ -401,6 +401,7 @@
 	"usage.month": "Останні 30 днів",
 	"usage.all": "За весь час",
 	"usage.calls": "викликів",
+	"usage.callsHeader": "Виклики",
 	"usage.tokens": "токенів",
 	"usage.noPrices": "вкажіть ціни нижче",
 	"usage.chartLabel": "Токени за днями за останні 30 днів",

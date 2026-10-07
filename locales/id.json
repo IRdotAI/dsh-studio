@@ -401,6 +401,7 @@
 	"usage.month": "30 hari terakhir",
 	"usage.all": "Sepanjang waktu",
 	"usage.calls": "panggilan",
+	"usage.callsHeader": "Panggilan",
 	"usage.tokens": "token",
 	"usage.noPrices": "tambahkan harga di bawah",
 	"usage.chartLabel": "Token per hari selama 30 hari terakhir",

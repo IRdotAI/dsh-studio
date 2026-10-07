@@ -401,6 +401,7 @@
 	"usage.month": "最近 30 天",
 	"usage.all": "全部",
 	"usage.calls": "次调用",
+	"usage.callsHeader": "调用次数",
 	"usage.tokens": "token",
 	"usage.noPrices": "请在下方填写价格",
 	"usage.chartLabel": "最近 30 天每天的 token 数",

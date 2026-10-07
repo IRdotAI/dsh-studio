@@ -401,6 +401,7 @@
 	"usage.month": "Afgelopen 30 dagen",
 	"usage.all": "Altijd",
 	"usage.calls": "aanroepen",
+	"usage.callsHeader": "Aanroepen",
 	"usage.tokens": "tokens",
 	"usage.noPrices": "vul hieronder prijzen in",
 	"usage.chartLabel": "Tokens per dag over de afgelopen 30 dagen",

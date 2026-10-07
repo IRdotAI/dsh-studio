@@ -18,7 +18,8 @@ function UsageChart({ days }) {
 			return h("rect", { key: d.day, x: i * col + (col - bar) / 2, y: H - height, width: bar, height, rx: 2, fill: "var(--dsw-alias-state-business-primary)", opacity: d.tokens ? 0.9 : 0 },
 				h("title", null, `${d.day} · ${fmtInt(d.tokens)} ${t("usage.tokens")} · ${fmtInt(d.calls)} ${t("usage.calls")}`));
 		}),
-		days.map((d, i) => (i % 7 === 0 || i === days.length - 1
+		// A date every 7 days, counted back from today so the last label never collides.
+		days.map((d, i) => ((days.length - 1 - i) % 7 === 0
 			? h("text", { key: "l" + d.day, x: i * col + col / 2, y: H + 13, textAnchor: "middle", fontSize: 9, fill: "var(--dsw-alias-label-tertiary)" }, d.day.slice(5))
 			: null)));
 }
@@ -84,7 +85,7 @@ function UsageTab() {
 			models.length
 				? h("div", { className: "st_tableWrap" }, h("table", { className: "st_table" },
 					h("thead", null, h("tr", null,
-						h("th", null, t("usage.model")), h("th", { className: "st_num" }, t("usage.calls")), h("th", { className: "st_num" }, t("usage.input")),
+						h("th", null, t("usage.model")), h("th", { className: "st_num" }, t("usage.callsHeader")), h("th", { className: "st_num" }, t("usage.input")),
 						h("th", { className: "st_num" }, t("usage.output")), h("th", { className: "st_num" }, t("usage.cached")), h("th", { className: "st_num" }, t("usage.cost")),
 						h("th", null, t("usage.priceIn")), h("th", null, t("usage.priceOut")), h("th", null, t("usage.priceCached")))),
 					h("tbody", null, models.map(([model, b]) => h("tr", { key: model },
