@@ -103,9 +103,14 @@ function apply(ctx) {
 	ctx.effect(() => {
 		void loadUpdates();
 		const afterHostCheck = setTimeout(loadUpdates, 20 * 1000); // the host's first check runs ~15 s after startup
+		// Fast while installing or restarting (the page reloads itself once the new version answers),
+		// every 10 s while an automatic update waits for the harness to go quiet.
+		let ticks = 0;
 		const busyPoll = setInterval(() => {
-			if (snapshot.updates && snapshot.updates.status !== "idle") void loadUpdates();
-		}, 1500);
+			const u = snapshot.updates;
+			ticks++;
+			if (u && (u.status !== "idle" || u.restarting || (u.restartTo && u.waitingForIdle && ticks % 10 === 0))) void loadUpdates();
+		}, 1000);
 		const slowPoll = setInterval(loadUpdates, 10 * 60 * 1000);
 		return () => {
 			clearTimeout(afterHostCheck);

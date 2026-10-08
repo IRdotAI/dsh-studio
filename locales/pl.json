@@ -449,7 +449,7 @@
 	"updates.source": "Aktualizacje pochodzą z wydań github.com/{repo}.",
 	"updates.check": "Sprawdź aktualizacje",
 	"updates.auto": "Instaluj aktualizacje automatycznie",
-	"updates.autoHint": "Studio sprawdza GitHub co 6 godzin i samo instaluje nowe wersje; zaczynają działać po następnym uruchomieniu DeepSeek Harness.",
+	"updates.autoHint": "Studio co 6 godzin sprawdza GitHuba i samo instaluje nowe wersje. Gdy ustawienie poniżej jest włączone, uruchamia potem DeepSeek Harness ponownie, gdy tylko nie trwa żadne zadanie.",
 	"updates.autoUnavailable": "Niedostępne dla tej kopii (patrz wyżej).",
 	"updates.available": "Dostępna jest v{version}.",
 	"updates.upToDate": "Masz najnowszą wersję.",
@@ -776,5 +776,15 @@
 	"editor.downloadFile": "Pobierz plik",
 	"editor.openFile": "Otwórz plik…",
 	"editor.fileSaved": "Pobrano plik motywu",
-	"editor.fileInvalid": "Ten plik nie jest motywem Studio."
+	"editor.fileInvalid": "Ten plik nie jest motywem Studio.",
+
+	"updates.restartAfter": "Uruchamiaj DeepSeek Harness ponownie po aktualizacji",
+	"updates.restartAfterHint": "Aktualizacje uruchomione przez Ciebie restartują od razu; automatyczne czekają, aż nie będzie trwało żadne zadanie. Otwarte okna odświeżą się same.",
+	"updates.restartUnavailable": "Ta kopia DeepSeek Harness nie została uruchomiona poleceniem dsh, więc nie może sama się zrestartować. Po aktualizacji uruchom ją ponownie samodzielnie.",
+	"updates.restartingTitle": "Ponowne uruchamianie DeepSeek Harness…",
+	"updates.restartingDesc": "Kończenie aktualizacji do v{version}. Ta strona odświeży się sama za kilka sekund.",
+	"updates.installedWaitDesc": "DeepSeek Harness uruchomi się ponownie, aby dokończyć, gdy tylko nie będzie trwało żadne zadanie. Albo zrób to teraz.",
+	"updates.restartNow": "Uruchom ponownie teraz",
+	"host.updates.cannotRestart": "Tutaj DeepSeek Harness nie może sam się zrestartować; uruchom go ponownie, aby dokończyć",
+	"host.updates.nothingToRestart": "Żadna zainstalowana aktualizacja nie czeka na ponowne uruchomienie"
 }

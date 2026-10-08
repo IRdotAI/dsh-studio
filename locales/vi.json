@@ -449,7 +449,7 @@
 	"updates.source": "Bản cập nhật lấy từ các bản phát hành trên github.com/{repo}.",
 	"updates.check": "Kiểm tra cập nhật",
 	"updates.auto": "Tự động cài cập nhật",
-	"updates.autoHint": "Studio kiểm tra GitHub mỗi 6 giờ và tự cài phiên bản mới; chúng có hiệu lực khi bạn khởi động lại DeepSeek Harness lần tới.",
+	"updates.autoHint": "Studio kiểm tra GitHub mỗi 6 giờ và tự cài phiên bản mới. Khi bật cài đặt bên dưới, nó sẽ khởi động lại DeepSeek Harness ngay khi không còn tác vụ nào đang chạy.",
 	"updates.autoUnavailable": "Không khả dụng cho bản này (xem phía trên).",
 	"updates.available": "Đã có v{version}.",
 	"updates.upToDate": "Bạn đang dùng bản mới nhất.",
@@ -776,5 +776,15 @@
 	"editor.downloadFile": "Tải tệp xuống",
 	"editor.openFile": "Mở tệp…",
 	"editor.fileSaved": "Đã tải tệp chủ đề",
-	"editor.fileInvalid": "Tệp này không phải chủ đề Studio."
+	"editor.fileInvalid": "Tệp này không phải chủ đề Studio.",
+
+	"updates.restartAfter": "Tự khởi động lại DeepSeek Harness sau khi cập nhật",
+	"updates.restartAfterHint": "Cập nhật do bạn bắt đầu sẽ khởi động lại ngay; cập nhật tự động sẽ chờ đến khi không còn tác vụ nào chạy. Các cửa sổ đang mở sẽ tự tải lại.",
+	"updates.restartUnavailable": "Bản DeepSeek Harness này không được khởi động bằng lệnh dsh nên không thể tự khởi động lại. Hãy tự khởi động lại sau khi cập nhật.",
+	"updates.restartingTitle": "Đang khởi động lại DeepSeek Harness…",
+	"updates.restartingDesc": "Đang hoàn tất cập nhật lên v{version}. Trang này sẽ tự tải lại sau vài giây.",
+	"updates.installedWaitDesc": "DeepSeek Harness sẽ tự khởi động lại để hoàn tất ngay khi không còn tác vụ nào chạy. Hoặc khởi động lại ngay bây giờ.",
+	"updates.restartNow": "Khởi động lại ngay",
+	"host.updates.cannotRestart": "Ở đây DeepSeek Harness không thể tự khởi động lại; hãy tự khởi động lại để hoàn tất",
+	"host.updates.nothingToRestart": "Không có bản cập nhật đã cài nào đang chờ khởi động lại"
 }

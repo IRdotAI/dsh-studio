@@ -130,6 +130,7 @@ function toggleFocus() {
 async function loadUpdates() {
 	try {
 		const updates = await apiGet("updates");
+		if (updates.restarting && !snapshot.updates?.restarting) toast(t("updates.restartingTitle"));
 		setSnap({ updates });
 		const done = updates.justUpdated;
 		if (done) {
@@ -139,6 +140,15 @@ async function loadUpdates() {
 			if (!announced) toast(t(compareVersions(done.to, done.from) < 0 ? "toast.downgraded" : "toast.updated", { version: done.to }));
 		}
 	} catch { /* older host or offline: the Updates tab says so */ }
+}
+
+/** "Restart now": finish an installed update by restarting the harness. */
+async function restartForUpdate() {
+	try {
+		setSnap({ updates: await apiPost("updates", { action: "restart" }) });
+	} catch (e) {
+		toast(errorText(e));
+	}
 }
 
 async function checkForUpdates() {

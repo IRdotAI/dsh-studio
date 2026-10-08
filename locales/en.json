@@ -449,7 +449,7 @@
 	"updates.source": "Updates come from github.com/{repo} releases.",
 	"updates.check": "Check for updates",
 	"updates.auto": "Install updates automatically",
-	"updates.autoHint": "Studio checks GitHub every 6 hours and installs new versions by itself; they take effect when you next restart DeepSeek Harness.",
+	"updates.autoHint": "Studio checks GitHub every 6 hours and installs new versions by itself. With the setting below on, it then restarts DeepSeek Harness as soon as no task is running.",
 	"updates.autoUnavailable": "Unavailable for this copy (see above).",
 	"updates.available": "v{version} is available.",
 	"updates.upToDate": "You're up to date.",
@@ -776,5 +776,15 @@
 	"editor.downloadFile": "Download file",
 	"editor.openFile": "Open file…",
 	"editor.fileSaved": "Theme file downloaded",
-	"editor.fileInvalid": "That file isn't a Studio theme."
+	"editor.fileInvalid": "That file isn't a Studio theme.",
+
+	"updates.restartAfter": "Restart DeepSeek Harness by itself after an update",
+	"updates.restartAfterHint": "Updates you start restart it right away; automatic ones wait until no task is running. Open windows reload by themselves.",
+	"updates.restartUnavailable": "This copy of DeepSeek Harness wasn't started with the dsh command, so it can't restart itself. Restart it yourself after an update.",
+	"updates.restartingTitle": "Restarting DeepSeek Harness…",
+	"updates.restartingDesc": "Finishing the update to v{version}. This page reloads by itself in a few seconds.",
+	"updates.installedWaitDesc": "DeepSeek Harness restarts by itself to finish as soon as no task is running. Or restart it now.",
+	"updates.restartNow": "Restart now",
+	"host.updates.cannotRestart": "DeepSeek Harness can't restart itself here; restart it yourself to finish",
+	"host.updates.nothingToRestart": "There's no installed update waiting for a restart"
 }

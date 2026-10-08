@@ -449,7 +449,7 @@
 	"updates.source": "Pembaruan berasal dari rilis github.com/{repo}.",
 	"updates.check": "Periksa pembaruan",
 	"updates.auto": "Pasang pembaruan otomatis",
-	"updates.autoHint": "Studio memeriksa GitHub setiap 6 jam dan memasang versi baru sendiri; berlaku saat Anda memulai ulang DeepSeek Harness berikutnya.",
+	"updates.autoHint": "Studio memeriksa GitHub setiap 6 jam dan memasang versi baru sendiri. Jika setelan di bawah aktif, lalu ia memulai ulang DeepSeek Harness begitu tidak ada tugas yang berjalan.",
 	"updates.autoUnavailable": "Tidak tersedia untuk salinan ini (lihat di atas).",
 	"updates.available": "v{version} tersedia.",
 	"updates.upToDate": "Anda sudah memakai versi terbaru.",
@@ -776,5 +776,15 @@
 	"editor.downloadFile": "Unduh berkas",
 	"editor.openFile": "Buka berkas…",
 	"editor.fileSaved": "Berkas tema diunduh",
-	"editor.fileInvalid": "Berkas itu bukan tema Studio."
+	"editor.fileInvalid": "Berkas itu bukan tema Studio.",
+
+	"updates.restartAfter": "Mulai ulang DeepSeek Harness sendiri setelah pembaruan",
+	"updates.restartAfterHint": "Pembaruan yang Anda mulai langsung memulai ulang; pembaruan otomatis menunggu sampai tidak ada tugas yang berjalan. Jendela yang terbuka memuat ulang sendiri.",
+	"updates.restartUnavailable": "Salinan DeepSeek Harness ini tidak dijalankan dengan perintah dsh, jadi tidak bisa memulai ulang sendiri. Mulai ulang sendiri setelah pembaruan.",
+	"updates.restartingTitle": "Memulai ulang DeepSeek Harness…",
+	"updates.restartingDesc": "Menyelesaikan pembaruan ke v{version}. Halaman ini akan memuat ulang sendiri dalam beberapa detik.",
+	"updates.installedWaitDesc": "DeepSeek Harness akan memulai ulang sendiri untuk menyelesaikan begitu tidak ada tugas yang berjalan. Atau mulai ulang sekarang.",
+	"updates.restartNow": "Mulai ulang sekarang",
+	"host.updates.cannotRestart": "DeepSeek Harness tidak bisa memulai ulang sendiri di sini; mulai ulang sendiri untuk menyelesaikan",
+	"host.updates.nothingToRestart": "Tidak ada pembaruan terpasang yang menunggu dimulai ulang"
 }

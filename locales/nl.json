@@ -449,7 +449,7 @@
 	"updates.source": "Updates komen uit de releases van github.com/{repo}.",
 	"updates.check": "Controleren op updates",
 	"updates.auto": "Updates automatisch installeren",
-	"updates.autoHint": "Studio controleert GitHub elke 6 uur en installeert nieuwe versies zelf; ze werken na de volgende herstart van DeepSeek Harness.",
+	"updates.autoHint": "Studio kijkt elke 6 uur op GitHub en installeert nieuwe versies zelf. Met de instelling hieronder aan start het daarna DeepSeek Harness opnieuw zodra er geen taak loopt.",
 	"updates.autoUnavailable": "Niet beschikbaar voor deze kopie (zie hierboven).",
 	"updates.available": "v{version} is beschikbaar.",
 	"updates.upToDate": "Je bent helemaal bij.",
@@ -776,5 +776,15 @@
 	"editor.downloadFile": "Bestand downloaden",
 	"editor.openFile": "Bestand openen…",
 	"editor.fileSaved": "Themabestand gedownload",
-	"editor.fileInvalid": "Dat bestand is geen Studio-thema."
+	"editor.fileInvalid": "Dat bestand is geen Studio-thema.",
+
+	"updates.restartAfter": "DeepSeek Harness na een update zelf opnieuw starten",
+	"updates.restartAfterHint": "Updates die je zelf start, herstarten meteen; automatische wachten tot er geen taak loopt. Open vensters laden zichzelf opnieuw.",
+	"updates.restartUnavailable": "Deze DeepSeek Harness is niet met het dsh-commando gestart en kan zichzelf dus niet herstarten. Start hem na een update zelf opnieuw.",
+	"updates.restartingTitle": "DeepSeek Harness wordt opnieuw gestart…",
+	"updates.restartingDesc": "De update naar v{version} wordt afgerond. Deze pagina laadt over een paar seconden vanzelf opnieuw.",
+	"updates.installedWaitDesc": "DeepSeek Harness start vanzelf opnieuw om af te ronden zodra er geen taak loopt. Of start hem nu opnieuw.",
+	"updates.restartNow": "Nu opnieuw starten",
+	"host.updates.cannotRestart": "DeepSeek Harness kan zichzelf hier niet herstarten; start hem zelf opnieuw om af te ronden",
+	"host.updates.nothingToRestart": "Er wacht geen geïnstalleerde update op een herstart"
 }

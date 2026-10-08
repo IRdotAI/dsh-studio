@@ -73,7 +73,7 @@ To remove it, use **Uninstall** on its Plugins page entry.
 | **Sync** | Back up your Studio settings to a **private** GitHub Gist and restore them on another computer, by hand or automatically a minute after each change. Uploaded images stay local unless you include them. |
 | **19 languages** | English, 简体中文, 繁體中文, 日本語, 한국어, Español, Français, Deutsch, Português (Brasil), Italiano, Русский, Українська, Polski, Nederlands, Türkçe, Tiếng Việt, Bahasa Indonesia, हिन्दी and العربية (right-to-left). |
 | **Advanced** | Custom CSS (applied last; use the `--dsw-*` design tokens), export/import settings as JSON, reset. |
-| **Updates** | Update banner and sidebar dot when a new version is out, optional auto-updates, and every release listed for updating, reinstalling or downgrading. |
+| **Updates** | Update banner and sidebar dot when a new version is out, optional auto-updates, every release listed for updating, reinstalling or downgrading, and an automatic harness restart afterwards so the new version takes over by itself. |
 | **Credits** | Who made Studio, what it builds on, and where each adapted theme palette comes from. |
 
 ## Updates
@@ -83,7 +83,7 @@ Studio updates itself from this repo's [releases](https://github.com/IRdotAI/dsh
 - When a new version is out, a banner at the top of Studio (and a dot on its sidebar icon) offers **Update now**, **Turn on auto-updates** and **What's new**.
 - **Studio → Updates** lists every release. **Update** to a newer one, **Reinstall** the current one, or **Downgrade** to an older one if a new version gives you trouble.
 - With **auto-updates** on, Studio checks GitHub every 6 hours and installs new versions by itself.
-- Installs go through DeepSeek Harness's own plugin manager (the same as Plugins → Add plugin) and take effect the next time you restart DeepSeek Harness.
+- Installs go through DeepSeek Harness's own plugin manager (the same as Plugins → Add plugin). A new version only runs in a fresh harness, so **Studio then restarts DeepSeek Harness by itself**: straight away for an update you start, and once no task is running for an automatic one. Open windows pick up the new version on their own. The restart reuses the exact command the harness was started with, on the same terminal or log, so Ctrl+C (or the app that started it) still stops it. Turn it off under **Studio → Updates → Restart DeepSeek Harness by itself after an update**; a harness started some other way than the `dsh` command needs a manual restart, and the Updates page says so.
 - Your settings are backed up before every install (`~/.dsh/studio/studio.backup-*.json`, newest five kept).
 - Downgrading switches auto-updates off, so Studio doesn't jump straight back.
 - Versions before 1.3.0 don't have the Updates page; to come back from one, use Plugins → Add plugin → `github:IRdotAI/dsh-studio` again.
@@ -113,6 +113,7 @@ Theming works by re-deriving DSH's three static colour scales (`--dsw-static-neu
 | `lib/shared.js` | Pure core: colour maths, presets, palette extraction, stylesheet builder, settings validation, schedule and sun times, prompt placeholders, usage totals and budgets, persona text and modes, chat export. Shared by both halves. |
 | `lib/index.js` | Host half: settings file, API routes, first-paint stylesheet, wallpaper (desktop, Bing, slideshow, video) and font serving, gallery and balance lookups, chat export, system-prompt section. |
 | `lib/updater.js` | Finds releases on GitHub and installs updates or downgrades through the harness plugin manager. |
+| `lib/restart.js` | Restarts the harness after an install: a graceful shutdown, then the same `dsh web` command again in the same process tree. |
 | `lib/usage.js` | Usage recorder: wraps `llm/stream` and stores each call's token counts. |
 | `lib/windows.js` | Reads the Windows accent colour. |
 | `lib/sync.js` | Private-gist backup and restore. |
@@ -135,7 +136,7 @@ All routes are behind DSH's own browser authentication.
 - `GET /api/studio/video-wallpaper`: the video wallpaper file (supports `Range`)
 - `GET /api/studio/export?session=<id>`: one chat's messages, for export
 - `GET /api/studio/font?f=<file>`: a file from the configured font folder (only files in that folder are served)
-- `GET /api/studio/updates`: version, releases and update status; `POST` it `{"action":"check"}` or `{"action":"install","version":"x.y.z"}`
+- `GET /api/studio/updates`: version, releases and update status; `POST` it `{"action":"check"}`, `{"action":"install","version":"x.y.z"}` or `{"action":"restart"}`
 - `GET /api/studio/usage`: usage totals and recent calls; `POST` it `{"action":"clear"}` or `{"action":"balance"}`
 - `GET /api/studio/sync`: sync status; `POST` it `{"action":"set-token","token":"…"}`, `clear-token`, `push` or `pull`
 - `GET /api/studio/gallery`: the community gallery (cached for an hour); `POST` to refresh
@@ -147,7 +148,7 @@ All routes are behind DSH's own browser authentication.
 git clone https://github.com/IRdotAI/dsh-studio
 cd dsh-studio
 node scripts/build.mjs           # rebuild lib/client.js
-node test/selftest.mjs           # 40 checks
+node test/selftest.mjs           # 41 checks
 node scripts/check-locales.mjs   # every language has every string
 node scripts/build-gallery.mjs   # validate gallery themes and prompt packs, rebuild gallery/index.json
 npx @deepseek-ai/dsh plugin --profile web add "$PWD"   # install your local copy

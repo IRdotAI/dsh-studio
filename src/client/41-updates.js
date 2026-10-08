@@ -12,10 +12,17 @@ function UpdateBanner() {
 	const auto = useSnap((s) => s.state.updates.auto);
 	if (!u) return null;
 	let body = null;
-	if (u.status === "installing" && u.installing) {
+	if (u.restarting) {
+		body = [h("span", { key: "i", className: "st_updateIcon st_spin", "aria-hidden": true }, "⟳"), h("div", { key: "t", className: "st_lookText" }, h("div", { className: "st_lookTitle" }, t("updates.restartingTitle")), h("div", { className: "st_lookDesc" }, t("updates.restartingDesc", { version: u.restarting })))];
+	} else if (u.status === "installing" && u.installing) {
 		body = [h("span", { key: "i", className: "st_updateIcon st_spin", "aria-hidden": true }, "⟳"), h("div", { key: "t", className: "st_lookText" }, h("div", { className: "st_lookTitle" }, t("updates.installingTitle", { version: u.installing.version })), h("div", { className: "st_lookDesc" }, t("updates.installingDesc")))];
 	} else if (u.restartTo) {
-		body = [h("span", { key: "i", className: "st_updateIcon", "aria-hidden": true }, "✅"), h("div", { key: "t", className: "st_lookText" }, h("div", { className: "st_lookTitle" }, t("updates.installedTitle", { version: u.restartTo })), h("div", { className: "st_lookDesc" }, t("updates.installedDesc")))];
+		const desc = u.waitingForIdle ? t("updates.installedWaitDesc") : t("updates.installedDesc");
+		body = [
+			h("span", { key: "i", className: "st_updateIcon", "aria-hidden": true }, "✅"),
+			h("div", { key: "t", className: "st_lookText" }, h("div", { className: "st_lookTitle" }, t("updates.installedTitle", { version: u.restartTo })), h("div", { className: "st_lookDesc" }, desc)),
+			u.canRestart ? h("div", { key: "a", className: "st_actions" }, h(Button, { kind: "primary", onClick: () => void restartForUpdate() }, t("updates.restartNow"))) : null,
+		];
 	} else if (u.updateAvailable && !u.blocker) {
 		body = [
 			h("span", { key: "i", className: "st_updateIcon", "aria-hidden": true }, "✨"),
@@ -60,6 +67,7 @@ function ReleaseRow({ release, u }) {
 function UpdatesTab() {
 	const u = useSnap((s) => s.updates);
 	const auto = useSnap((s) => s.state.updates.auto);
+	const restartAfter = useSnap((s) => s.state.updates.restartAfter);
 	if (!u) return h(Section, { title: t("updates.title") }, h("p", { className: "st_hint" }, t("updates.unreachable")));
 	const blocked = blockerText(u);
 	return [
@@ -71,6 +79,11 @@ function UpdatesTab() {
 		},
 			blocked ? h("p", { className: "st_creditLine" }, blocked) : null,
 			h(Toggle, { checked: auto && !u.blocker, disabled: Boolean(u.blocker), onChange: setAutoUpdates, label: t("updates.auto"), hint: u.blocker ? t("updates.autoUnavailable") : t("updates.autoHint") }),
+			h(Toggle, {
+				checked: restartAfter && u.canRestart, disabled: !u.canRestart, label: t("updates.restartAfter"),
+				hint: u.canRestart ? t("updates.restartAfterHint") : t("updates.restartUnavailable"),
+				onChange: (on) => { update({ updates: { restartAfter: on } }); setTimeout(loadUpdates, 800); },
+			}),
 			h("span", { className: "st_hint" },
 				u.error ? hostText(u.error) : u.updateAvailable ? t("updates.available", { version: u.latest }) : u.releases.length ? t("updates.upToDate") : t("updates.noReleases"),
 				" ", t("updates.lastChecked", { when: sinceText(u.lastCheck) })),

@@ -1,7 +1,7 @@
 {
   "name": "dsh-studio",
   "description": "Themes and personalisation for DeepSeek Harness: 18 themes, a theme editor (moods, one colour, any word or any image; locks, fine-tune sliders, variations, undo, colour-blindness preview), a theme per workspace, a community gallery of themes and prompt packs, liquid-glass panels, wallpapers (Bing daily, slideshow, video), fonts, saved looks on a time or sunrise/sunset schedule, Windows accent colours, layout and focus mode, AI modes, task-finished alerts, a usage and cost dashboard with spending alerts, chat export to Markdown and PDF, accessibility options, smarter saved prompts, settings sync via a private GitHub Gist, a Ctrl+K quick switcher, and 19 languages",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "private": true,
   "author": "RdotA",
   "license": "MIT",
@@ -31,12 +31,14 @@
     "./client": "./lib/client.js",
     "./cordis.patch.yml": "./cordis.patch.yml",
     "./package.json": "./package.json",
-    "./updater": "./lib/updater.js"
+    "./updater": "./lib/updater.js",
+    "./restart": "./lib/restart.js"
   },
   "files": [
     "lib/index.js",
     "lib/shared.js",
     "lib/updater.js",
+    "lib/restart.js",
     "lib/usage.js",
     "lib/windows.js",
     "lib/sync.js",

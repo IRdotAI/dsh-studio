@@ -449,7 +449,7 @@
 	"updates.source": "अपडेट github.com/{repo} की रिलीज़ से आते हैं।",
 	"updates.check": "अपडेट देखें",
 	"updates.auto": "अपडेट अपने-आप इंस्टॉल करें",
-	"updates.autoHint": "Studio हर 6 घंटे में GitHub देखता है और नए वर्ज़न खुद इंस्टॉल करता है; ये DeepSeek Harness को अगली बार फिर से शुरू करने पर लागू होते हैं।",
+	"updates.autoHint": "Studio हर 6 घंटे में GitHub देखता है और नए वर्शन अपने-आप इंस्टॉल करता है। नीचे की सेटिंग चालू हो, तो कोई काम न चल रहा हो तभी वह DeepSeek Harness को रीस्टार्ट कर देता है।",
 	"updates.autoUnavailable": "इस कॉपी के लिए उपलब्ध नहीं (ऊपर देखें)।",
 	"updates.available": "v{version} उपलब्ध है।",
 	"updates.upToDate": "आप नवीनतम वर्ज़न पर हैं।",
@@ -776,5 +776,15 @@
 	"editor.downloadFile": "फ़ाइल डाउनलोड करें",
 	"editor.openFile": "फ़ाइल खोलें…",
 	"editor.fileSaved": "थीम फ़ाइल डाउनलोड हो गई",
-	"editor.fileInvalid": "यह फ़ाइल Studio थीम नहीं है।"
+	"editor.fileInvalid": "यह फ़ाइल Studio थीम नहीं है।",
+
+	"updates.restartAfter": "अपडेट के बाद DeepSeek Harness अपने-आप रीस्टार्ट करें",
+	"updates.restartAfterHint": "आपके शुरू किए अपडेट तुरंत रीस्टार्ट करते हैं; अपने-आप वाले अपडेट तब तक रुकते हैं जब तक कोई काम न चल रहा हो। खुली विंडो अपने-आप रीलोड हो जाती हैं।",
+	"updates.restartUnavailable": "यह DeepSeek Harness dsh कमांड से शुरू नहीं हुआ, इसलिए खुद रीस्टार्ट नहीं हो सकता। अपडेट के बाद इसे खुद रीस्टार्ट करें।",
+	"updates.restartingTitle": "DeepSeek Harness रीस्टार्ट हो रहा है…",
+	"updates.restartingDesc": "v{version} का अपडेट पूरा हो रहा है। यह पेज कुछ सेकंड में अपने-आप रीलोड होगा।",
+	"updates.installedWaitDesc": "कोई काम न चल रहा हो, तो DeepSeek Harness अपडेट पूरा करने के लिए अपने-आप रीस्टार्ट हो जाएगा। या अभी रीस्टार्ट करें।",
+	"updates.restartNow": "अभी रीस्टार्ट करें",
+	"host.updates.cannotRestart": "यहाँ DeepSeek Harness खुद रीस्टार्ट नहीं हो सकता; पूरा करने के लिए इसे खुद रीस्टार्ट करें",
+	"host.updates.nothingToRestart": "रीस्टार्ट का इंतज़ार कर रहा कोई इंस्टॉल किया हुआ अपडेट नहीं है"
 }

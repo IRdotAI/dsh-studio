@@ -449,7 +449,7 @@
 	"updates.source": "Обновления берутся из релизов github.com/{repo}.",
 	"updates.check": "Проверить обновления",
 	"updates.auto": "Устанавливать обновления автоматически",
-	"updates.autoHint": "Studio проверяет GitHub каждые 6 часов и сам ставит новые версии; они вступают в силу при следующем перезапуске DeepSeek Harness.",
+	"updates.autoHint": "Studio проверяет GitHub каждые 6 часов и сам устанавливает новые версии. Если настройка ниже включена, он затем перезапускает DeepSeek Harness, как только не будет выполняющихся задач.",
 	"updates.autoUnavailable": "Недоступно для этой копии (см. выше).",
 	"updates.available": "Доступна v{version}.",
 	"updates.upToDate": "У вас последняя версия.",
@@ -776,5 +776,15 @@
 	"editor.downloadFile": "Скачать файл",
 	"editor.openFile": "Открыть файл…",
 	"editor.fileSaved": "Файл темы скачан",
-	"editor.fileInvalid": "Этот файл не является темой Studio."
+	"editor.fileInvalid": "Этот файл не является темой Studio.",
+
+	"updates.restartAfter": "Перезапускать DeepSeek Harness после обновления автоматически",
+	"updates.restartAfterHint": "Обновления, запущенные вами, перезапускают сразу; автоматические ждут, пока не будет выполняющихся задач. Открытые окна перезагрузятся сами.",
+	"updates.restartUnavailable": "Эта копия DeepSeek Harness запущена не командой dsh, поэтому не может перезапуститься сама. После обновления перезапустите её вручную.",
+	"updates.restartingTitle": "Перезапуск DeepSeek Harness…",
+	"updates.restartingDesc": "Завершаем обновление до v{version}. Страница перезагрузится сама через несколько секунд.",
+	"updates.installedWaitDesc": "DeepSeek Harness перезапустится сам, чтобы завершить обновление, как только не будет выполняющихся задач. Или перезапустите сейчас.",
+	"updates.restartNow": "Перезапустить сейчас",
+	"host.updates.cannotRestart": "Здесь DeepSeek Harness не может перезапуститься сам; перезапустите его вручную, чтобы завершить",
+	"host.updates.nothingToRestart": "Нет установленного обновления, ожидающего перезапуска"
 }

@@ -449,7 +449,7 @@
 	"updates.source": "Оновлення беруться з релізів github.com/{repo}.",
 	"updates.check": "Перевірити оновлення",
 	"updates.auto": "Встановлювати оновлення автоматично",
-	"updates.autoHint": "Studio перевіряє GitHub кожні 6 годин і сам ставить нові версії; вони набувають чинності після наступного перезапуску DeepSeek Harness.",
+	"updates.autoHint": "Studio перевіряє GitHub кожні 6 годин і сам встановлює нові версії. Якщо налаштування нижче ввімкнено, він потім перезапускає DeepSeek Harness, щойно не буде запущених завдань.",
 	"updates.autoUnavailable": "Недоступно для цієї копії (див. вище).",
 	"updates.available": "Доступна v{version}.",
 	"updates.upToDate": "У вас остання версія.",
@@ -776,5 +776,15 @@
 	"editor.downloadFile": "Завантажити файл",
 	"editor.openFile": "Відкрити файл…",
 	"editor.fileSaved": "Файл теми завантажено",
-	"editor.fileInvalid": "Цей файл не є темою Studio."
+	"editor.fileInvalid": "Цей файл не є темою Studio.",
+
+	"updates.restartAfter": "Перезапускати DeepSeek Harness після оновлення автоматично",
+	"updates.restartAfterHint": "Оновлення, які запускаєте ви, перезапускають одразу; автоматичні чекають, доки не буде запущених завдань. Відкриті вікна перезавантажаться самі.",
+	"updates.restartUnavailable": "Цю копію DeepSeek Harness запущено не командою dsh, тож вона не може перезапуститися сама. Після оновлення перезапустіть її вручну.",
+	"updates.restartingTitle": "Перезапуск DeepSeek Harness…",
+	"updates.restartingDesc": "Завершуємо оновлення до v{version}. Сторінка перезавантажиться сама за кілька секунд.",
+	"updates.installedWaitDesc": "DeepSeek Harness перезапуститься сам, щоб завершити оновлення, щойно не буде запущених завдань. Або перезапустіть зараз.",
+	"updates.restartNow": "Перезапустити зараз",
+	"host.updates.cannotRestart": "Тут DeepSeek Harness не може перезапуститися сам; перезапустіть його вручну, щоб завершити",
+	"host.updates.nothingToRestart": "Немає встановленого оновлення, що чекає на перезапуск"
 }

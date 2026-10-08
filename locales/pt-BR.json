@@ -449,7 +449,7 @@
 	"updates.source": "As atualizações vêm das versões publicadas em github.com/{repo}.",
 	"updates.check": "Verificar atualizações",
 	"updates.auto": "Instalar atualizações automaticamente",
-	"updates.autoHint": "O Studio verifica o GitHub a cada 6 horas e instala novas versões sozinho; elas valem a partir da próxima vez que você reiniciar o DeepSeek Harness.",
+	"updates.autoHint": "O Studio verifica o GitHub a cada 6 horas e instala as versões novas sozinho. Com o ajuste abaixo ligado, ele reinicia o DeepSeek Harness assim que nenhuma tarefa estiver em andamento.",
 	"updates.autoUnavailable": "Indisponível para esta cópia (veja acima).",
 	"updates.available": "A v{version} está disponível.",
 	"updates.upToDate": "Você está atualizado.",
@@ -776,5 +776,15 @@
 	"editor.downloadFile": "Baixar arquivo",
 	"editor.openFile": "Abrir arquivo…",
 	"editor.fileSaved": "Arquivo do tema baixado",
-	"editor.fileInvalid": "Esse arquivo não é um tema do Studio."
+	"editor.fileInvalid": "Esse arquivo não é um tema do Studio.",
+
+	"updates.restartAfter": "Reiniciar o DeepSeek Harness sozinho depois de atualizar",
+	"updates.restartAfterHint": "Atualizações que você inicia reiniciam na hora; as automáticas esperam até não haver tarefa em andamento. As janelas abertas recarregam sozinhas.",
+	"updates.restartUnavailable": "Esta cópia do DeepSeek Harness não foi iniciada com o comando dsh, então não consegue se reiniciar. Reinicie você mesmo depois de atualizar.",
+	"updates.restartingTitle": "Reiniciando o DeepSeek Harness…",
+	"updates.restartingDesc": "Concluindo a atualização para a v{version}. Esta página recarrega sozinha em alguns segundos.",
+	"updates.installedWaitDesc": "O DeepSeek Harness reinicia sozinho para concluir assim que nenhuma tarefa estiver em andamento. Ou reinicie agora.",
+	"updates.restartNow": "Reiniciar agora",
+	"host.updates.cannotRestart": "O DeepSeek Harness não consegue se reiniciar aqui; reinicie você mesmo para concluir",
+	"host.updates.nothingToRestart": "Não há atualização instalada aguardando reinício"
 }

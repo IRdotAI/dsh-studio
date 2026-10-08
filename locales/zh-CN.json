@@ -449,7 +449,7 @@
 	"updates.source": "更新来自 github.com/{repo} 的发布版本。",
 	"updates.check": "检查更新",
 	"updates.auto": "自动安装更新",
-	"updates.autoHint": "Studio 每 6 小时检查一次 GitHub 并自动安装新版本；下次重启 DeepSeek Harness 时生效。",
+	"updates.autoHint": "Studio 每 6 小时检查一次 GitHub，并自动安装新版本。打开下面的设置后，它会在没有任务运行时立即重启 DeepSeek Harness。",
 	"updates.autoUnavailable": "此副本不可用（见上文）。",
 	"updates.available": "v{version} 可用。",
 	"updates.upToDate": "已是最新版本。",
@@ -776,5 +776,15 @@
 	"editor.downloadFile": "下载文件",
 	"editor.openFile": "打开文件…",
 	"editor.fileSaved": "主题文件已下载",
-	"editor.fileInvalid": "这个文件不是 Studio 主题。"
+	"editor.fileInvalid": "这个文件不是 Studio 主题。",
+
+	"updates.restartAfter": "更新后自动重启 DeepSeek Harness",
+	"updates.restartAfterHint": "你手动开始的更新会立即重启；自动更新会等到没有任务运行时再重启。打开的窗口会自动重新加载。",
+	"updates.restartUnavailable": "这个 DeepSeek Harness 不是用 dsh 命令启动的，所以无法自行重启。更新后请手动重启。",
+	"updates.restartingTitle": "正在重启 DeepSeek Harness…",
+	"updates.restartingDesc": "正在完成到 v{version} 的更新。此页面会在几秒钟后自动重新加载。",
+	"updates.installedWaitDesc": "没有任务运行时，DeepSeek Harness 会自动重启以完成更新。也可以现在就重启。",
+	"updates.restartNow": "立即重启",
+	"host.updates.cannotRestart": "DeepSeek Harness 在这里无法自行重启；请手动重启以完成更新",
+	"host.updates.nothingToRestart": "没有等待重启的已安装更新"
 }

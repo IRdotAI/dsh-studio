@@ -449,7 +449,7 @@
 	"updates.source": "Las actualizaciones vienen de las versiones publicadas en github.com/{repo}.",
 	"updates.check": "Buscar actualizaciones",
 	"updates.auto": "Instalar actualizaciones automáticamente",
-	"updates.autoHint": "Studio revisa GitHub cada 6 horas e instala las versiones nuevas por sí solo; se aplican la próxima vez que reinicies DeepSeek Harness.",
+	"updates.autoHint": "Studio revisa GitHub cada 6 horas e instala las versiones nuevas por sí solo. Con el ajuste de abajo activado, luego reinicia DeepSeek Harness en cuanto no haya ninguna tarea en curso.",
 	"updates.autoUnavailable": "No disponible para esta copia (ver arriba).",
 	"updates.available": "La v{version} está disponible.",
 	"updates.upToDate": "Estás al día.",
@@ -776,5 +776,15 @@
 	"editor.downloadFile": "Descargar archivo",
 	"editor.openFile": "Abrir archivo…",
 	"editor.fileSaved": "Archivo del tema descargado",
-	"editor.fileInvalid": "Ese archivo no es un tema de Studio."
+	"editor.fileInvalid": "Ese archivo no es un tema de Studio.",
+
+	"updates.restartAfter": "Reiniciar DeepSeek Harness por sí solo después de actualizar",
+	"updates.restartAfterHint": "Las actualizaciones que inicias tú reinician al momento; las automáticas esperan a que no haya ninguna tarea en curso. Las ventanas abiertas se recargan solas.",
+	"updates.restartUnavailable": "Esta copia de DeepSeek Harness no se inició con el comando dsh, así que no puede reiniciarse sola. Reiníciala tú después de actualizar.",
+	"updates.restartingTitle": "Reiniciando DeepSeek Harness…",
+	"updates.restartingDesc": "Terminando la actualización a v{version}. Esta página se recargará sola en unos segundos.",
+	"updates.installedWaitDesc": "DeepSeek Harness se reiniciará solo para terminar en cuanto no haya ninguna tarea en curso. O reinícialo ahora.",
+	"updates.restartNow": "Reiniciar ahora",
+	"host.updates.cannotRestart": "DeepSeek Harness no puede reiniciarse solo aquí; reinícialo tú para terminar",
+	"host.updates.nothingToRestart": "No hay ninguna actualización instalada esperando un reinicio"
 }

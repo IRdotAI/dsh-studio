@@ -449,7 +449,7 @@
 	"updates.source": "Les mises à jour proviennent des versions publiées sur github.com/{repo}.",
 	"updates.check": "Rechercher des mises à jour",
 	"updates.auto": "Installer les mises à jour automatiquement",
-	"updates.autoHint": "Studio consulte GitHub toutes les 6 heures et installe seul les nouvelles versions ; elles prennent effet au prochain redémarrage de DeepSeek Harness.",
+	"updates.autoHint": "Studio consulte GitHub toutes les 6 heures et installe lui-même les nouvelles versions. Avec le réglage ci-dessous activé, il redémarre ensuite DeepSeek Harness dès qu’aucune tâche n’est en cours.",
 	"updates.autoUnavailable": "Indisponible pour cette copie (voir ci-dessus).",
 	"updates.available": "La v{version} est disponible.",
 	"updates.upToDate": "Vous êtes à jour.",
@@ -776,5 +776,15 @@
 	"editor.downloadFile": "Télécharger le fichier",
 	"editor.openFile": "Ouvrir un fichier…",
 	"editor.fileSaved": "Fichier du thème téléchargé",
-	"editor.fileInvalid": "Ce fichier n’est pas un thème Studio."
+	"editor.fileInvalid": "Ce fichier n’est pas un thème Studio.",
+
+	"updates.restartAfter": "Redémarrer DeepSeek Harness tout seul après une mise à jour",
+	"updates.restartAfterHint": "Les mises à jour que vous lancez redémarrent tout de suite ; les automatiques attendent qu’aucune tâche ne tourne. Les fenêtres ouvertes se rechargent d’elles-mêmes.",
+	"updates.restartUnavailable": "Cette copie de DeepSeek Harness n’a pas été lancée avec la commande dsh, elle ne peut donc pas redémarrer seule. Redémarrez-la vous-même après une mise à jour.",
+	"updates.restartingTitle": "Redémarrage de DeepSeek Harness…",
+	"updates.restartingDesc": "Finalisation de la mise à jour vers la v{version}. Cette page se recharge d’elle-même dans quelques secondes.",
+	"updates.installedWaitDesc": "DeepSeek Harness redémarrera tout seul pour terminer dès qu’aucune tâche ne sera en cours. Ou redémarrez-le maintenant.",
+	"updates.restartNow": "Redémarrer maintenant",
+	"host.updates.cannotRestart": "DeepSeek Harness ne peut pas redémarrer seul ici ; redémarrez-le vous-même pour terminer",
+	"host.updates.nothingToRestart": "Aucune mise à jour installée n’attend de redémarrage"
 }

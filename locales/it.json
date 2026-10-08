@@ -449,7 +449,7 @@
 	"updates.source": "Gli aggiornamenti arrivano dalle release di github.com/{repo}.",
 	"updates.check": "Cerca aggiornamenti",
 	"updates.auto": "Installa gli aggiornamenti automaticamente",
-	"updates.autoHint": "Studio controlla GitHub ogni 6 ore e installa da solo le nuove versioni; diventano effettive al prossimo riavvio di DeepSeek Harness.",
+	"updates.autoHint": "Studio controlla GitHub ogni 6 ore e installa da solo le nuove versioni. Con l’impostazione qui sotto attiva, poi riavvia DeepSeek Harness appena nessuna attività è in corso.",
 	"updates.autoUnavailable": "Non disponibile per questa copia (vedi sopra).",
 	"updates.available": "È disponibile la v{version}.",
 	"updates.upToDate": "Sei aggiornato.",
@@ -776,5 +776,15 @@
 	"editor.downloadFile": "Scarica il file",
 	"editor.openFile": "Apri un file…",
 	"editor.fileSaved": "File del tema scaricato",
-	"editor.fileInvalid": "Questo file non è un tema di Studio."
+	"editor.fileInvalid": "Questo file non è un tema di Studio.",
+
+	"updates.restartAfter": "Riavvia DeepSeek Harness da solo dopo un aggiornamento",
+	"updates.restartAfterHint": "Gli aggiornamenti che avvii tu riavviano subito; quelli automatici aspettano che nessuna attività sia in corso. Le finestre aperte si ricaricano da sole.",
+	"updates.restartUnavailable": "Questa copia di DeepSeek Harness non è stata avviata con il comando dsh, quindi non può riavviarsi da sola. Riavviala tu dopo un aggiornamento.",
+	"updates.restartingTitle": "Riavvio di DeepSeek Harness…",
+	"updates.restartingDesc": "Sto completando l’aggiornamento alla v{version}. Questa pagina si ricarica da sola tra pochi secondi.",
+	"updates.installedWaitDesc": "DeepSeek Harness si riavvia da solo per completare appena nessuna attività è in corso. Oppure riavvialo ora.",
+	"updates.restartNow": "Riavvia ora",
+	"host.updates.cannotRestart": "Qui DeepSeek Harness non può riavviarsi da solo; riavvialo tu per completare",
+	"host.updates.nothingToRestart": "Nessun aggiornamento installato è in attesa di un riavvio"
 }

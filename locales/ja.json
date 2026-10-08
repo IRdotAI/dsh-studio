@@ -449,7 +449,7 @@
 	"updates.source": "アップデートは github.com/{repo} のリリースから取得します。",
 	"updates.check": "アップデートを確認",
 	"updates.auto": "アップデートを自動でインストール",
-	"updates.autoHint": "Studio は 6 時間ごとに GitHub を確認し、新しいバージョンを自動でインストールします。次に DeepSeek Harness を再起動したときに反映されます。",
+	"updates.autoHint": "Studio は 6 時間ごとに GitHub を確認し、新しいバージョンを自動でインストールします。下の設定がオンなら、実行中のタスクがなくなった時点で DeepSeek Harness を再起動します。",
 	"updates.autoUnavailable": "このコピーでは使えません（上記参照）。",
 	"updates.available": "v{version} が利用できます。",
 	"updates.upToDate": "最新の状態です。",
@@ -776,5 +776,15 @@
 	"editor.downloadFile": "ファイルをダウンロード",
 	"editor.openFile": "ファイルを開く…",
 	"editor.fileSaved": "テーマファイルをダウンロードしました",
-	"editor.fileInvalid": "このファイルは Studio のテーマではありません。"
+	"editor.fileInvalid": "このファイルは Studio のテーマではありません。",
+
+	"updates.restartAfter": "更新後に DeepSeek Harness を自動で再起動",
+	"updates.restartAfterHint": "自分で始めた更新はすぐに再起動し、自動更新はタスクが動いていないときまで待ちます。開いているウィンドウは自動で再読み込みされます。",
+	"updates.restartUnavailable": "この DeepSeek Harness は dsh コマンドで起動されていないため、自分では再起動できません。更新後に手動で再起動してください。",
+	"updates.restartingTitle": "DeepSeek Harness を再起動しています…",
+	"updates.restartingDesc": "v{version} への更新を仕上げています。このページは数秒で自動的に再読み込みされます。",
+	"updates.installedWaitDesc": "実行中のタスクがなくなると、DeepSeek Harness が自動で再起動して更新を完了します。今すぐ再起動することもできます。",
+	"updates.restartNow": "今すぐ再起動",
+	"host.updates.cannotRestart": "ここでは DeepSeek Harness が自分で再起動できません。完了するには手動で再起動してください",
+	"host.updates.nothingToRestart": "再起動を待っているインストール済みの更新はありません"
 }

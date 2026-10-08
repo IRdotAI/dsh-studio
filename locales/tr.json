@@ -449,7 +449,7 @@
 	"updates.source": "Güncellemeler github.com/{repo} sürümlerinden gelir.",
 	"updates.check": "Güncellemeleri denetle",
 	"updates.auto": "Güncellemeleri otomatik yükle",
-	"updates.autoHint": "Studio GitHub'ı 6 saatte bir denetler ve yeni sürümleri kendisi yükler; DeepSeek Harness'ı bir sonraki yeniden başlatışınızda etkin olur.",
+	"updates.autoHint": "Studio GitHub'ı 6 saatte bir denetler ve yeni sürümleri kendisi yükler. Aşağıdaki ayar açıksa, çalışan görev kalmadığı anda DeepSeek Harness'ı yeniden başlatır.",
 	"updates.autoUnavailable": "Bu kopya için kullanılamaz (yukarıya bakın).",
 	"updates.available": "v{version} mevcut.",
 	"updates.upToDate": "Güncelsiniz.",
@@ -776,5 +776,15 @@
 	"editor.downloadFile": "Dosyayı indir",
 	"editor.openFile": "Dosya aç…",
 	"editor.fileSaved": "Tema dosyası indirildi",
-	"editor.fileInvalid": "Bu dosya bir Studio teması değil."
+	"editor.fileInvalid": "Bu dosya bir Studio teması değil.",
+
+	"updates.restartAfter": "Güncellemeden sonra DeepSeek Harness'ı kendiliğinden yeniden başlat",
+	"updates.restartAfterHint": "Sizin başlattığınız güncellemeler hemen yeniden başlatır; otomatik olanlar çalışan görev kalmayana kadar bekler. Açık pencereler kendiliğinden yenilenir.",
+	"updates.restartUnavailable": "Bu DeepSeek Harness dsh komutuyla başlatılmadığı için kendini yeniden başlatamaz. Güncellemeden sonra kendiniz yeniden başlatın.",
+	"updates.restartingTitle": "DeepSeek Harness yeniden başlatılıyor…",
+	"updates.restartingDesc": "v{version} güncellemesi tamamlanıyor. Bu sayfa birkaç saniye içinde kendiliğinden yenilenecek.",
+	"updates.installedWaitDesc": "Çalışan görev kalmadığında DeepSeek Harness güncellemeyi bitirmek için kendiliğinden yeniden başlar. Ya da şimdi yeniden başlatın.",
+	"updates.restartNow": "Şimdi yeniden başlat",
+	"host.updates.cannotRestart": "DeepSeek Harness burada kendini yeniden başlatamıyor; bitirmek için kendiniz yeniden başlatın",
+	"host.updates.nothingToRestart": "Yeniden başlatma bekleyen yüklü bir güncelleme yok"
 }

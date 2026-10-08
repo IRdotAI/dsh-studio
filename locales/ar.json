@@ -449,7 +449,7 @@
 	"updates.source": "تأتي التحديثات من إصدارات github.com/{repo}.",
 	"updates.check": "تحقّق من التحديثات",
 	"updates.auto": "ثبّت التحديثات تلقائيًا",
-	"updates.autoHint": "يتحقق Studio من GitHub كل 6 ساعات ويثبّت الإصدارات الجديدة بنفسه؛ وتسري عند إعادة تشغيل DeepSeek Harness التالية.",
+	"updates.autoHint": "يتحقق Studio من GitHub كل 6 ساعات ويثبّت الإصدارات الجديدة تلقائيًا. وإذا كان الإعداد أدناه مفعّلًا، يعيد تشغيل DeepSeek Harness فور عدم وجود مهمة قيد التشغيل.",
 	"updates.autoUnavailable": "غير متاح لهذه النسخة (انظر أعلاه).",
 	"updates.available": "الإصدار v{version} متاح.",
 	"updates.upToDate": "أنت على أحدث إصدار.",
@@ -776,5 +776,15 @@
 	"editor.downloadFile": "تنزيل الملف",
 	"editor.openFile": "فتح ملف…",
 	"editor.fileSaved": "تم تنزيل ملف السمة",
-	"editor.fileInvalid": "هذا الملف ليس سمة من Studio."
+	"editor.fileInvalid": "هذا الملف ليس سمة من Studio.",
+
+	"updates.restartAfter": "أعد تشغيل DeepSeek Harness تلقائيًا بعد التحديث",
+	"updates.restartAfterHint": "التحديثات التي تبدؤها تعيد التشغيل فورًا، أما التلقائية فتنتظر حتى لا تكون هناك مهمة قيد التشغيل. تُعاد تحميل النوافذ المفتوحة تلقائيًا.",
+	"updates.restartUnavailable": "لم تُشغَّل نسخة DeepSeek Harness هذه بالأمر dsh، لذا لا يمكنها إعادة تشغيل نفسها. أعد تشغيلها بنفسك بعد التحديث.",
+	"updates.restartingTitle": "جارٍ إعادة تشغيل DeepSeek Harness…",
+	"updates.restartingDesc": "جارٍ إكمال التحديث إلى v{version}. ستُعاد تحميل هذه الصفحة تلقائيًا خلال ثوانٍ.",
+	"updates.installedWaitDesc": "سيعيد DeepSeek Harness تشغيل نفسه لإكمال التحديث فور عدم وجود مهمة قيد التشغيل. أو أعد تشغيله الآن.",
+	"updates.restartNow": "إعادة التشغيل الآن",
+	"host.updates.cannotRestart": "لا يمكن لـ DeepSeek Harness إعادة تشغيل نفسه هنا؛ أعد تشغيله بنفسك للإكمال",
+	"host.updates.nothingToRestart": "لا يوجد تحديث مثبَّت ينتظر إعادة التشغيل"
 }

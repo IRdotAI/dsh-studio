@@ -449,7 +449,7 @@
 	"updates.source": "Updates kommen aus den Releases von github.com/{repo}.",
 	"updates.check": "Nach Updates suchen",
 	"updates.auto": "Updates automatisch installieren",
-	"updates.autoHint": "Studio prüft GitHub alle 6 Stunden und installiert neue Versionen selbst; sie gelten ab dem nächsten Neustart von DeepSeek Harness.",
+	"updates.autoHint": "Studio prüft alle 6 Stunden GitHub und installiert neue Versionen selbst. Ist die Einstellung darunter an, startet es DeepSeek Harness danach neu, sobald keine Aufgabe läuft.",
 	"updates.autoUnavailable": "Für diese Kopie nicht verfügbar (siehe oben).",
 	"updates.available": "v{version} ist verfügbar.",
 	"updates.upToDate": "Du bist auf dem neuesten Stand.",
@@ -776,5 +776,15 @@
 	"editor.downloadFile": "Datei herunterladen",
 	"editor.openFile": "Datei öffnen…",
 	"editor.fileSaved": "Theme-Datei heruntergeladen",
-	"editor.fileInvalid": "Diese Datei ist kein Studio-Theme."
+	"editor.fileInvalid": "Diese Datei ist kein Studio-Theme.",
+
+	"updates.restartAfter": "DeepSeek Harness nach einem Update selbst neu starten",
+	"updates.restartAfterHint": "Updates, die du startest, starten sofort neu; automatische warten, bis keine Aufgabe läuft. Offene Fenster laden sich selbst neu.",
+	"updates.restartUnavailable": "Diese DeepSeek Harness wurde nicht mit dem dsh-Befehl gestartet und kann sich daher nicht selbst neu starten. Starte sie nach einem Update selbst neu.",
+	"updates.restartingTitle": "DeepSeek Harness startet neu…",
+	"updates.restartingDesc": "Das Update auf v{version} wird abgeschlossen. Diese Seite lädt sich in ein paar Sekunden selbst neu.",
+	"updates.installedWaitDesc": "DeepSeek Harness startet zum Abschluss selbst neu, sobald keine Aufgabe läuft. Oder starte sie jetzt neu.",
+	"updates.restartNow": "Jetzt neu starten",
+	"host.updates.cannotRestart": "DeepSeek Harness kann sich hier nicht selbst neu starten; starte sie zum Abschluss selbst neu",
+	"host.updates.nothingToRestart": "Kein installiertes Update wartet auf einen Neustart"
 }

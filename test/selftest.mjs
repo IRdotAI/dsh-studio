@@ -13,6 +13,9 @@ import {
 	EDITOR_MINIMUMS, MOODS, HARMONIES, themeFromColor, themeFromMood, themeFromWord, adjustTheme, mirrorMode, fixContrast,
 	themeVariations, swapAccents, seededRandom, autoAccent2 } from "../lib/shared.js";
 import { UsageLog } from "../lib/usage.js";
+import { relaunchArgs, exitIntoChild } from "../lib/restart.js";
+import { Updater } from "../lib/updater.js";
+import { EventEmitter } from "node:events";
 import { GistSync } from "../lib/sync.js";
 import { checkLocales } from "../scripts/check-locales.mjs";
 
@@ -620,6 +623,76 @@ test("theme editor tools: moods, one colour, words, fine-tune, mirror, variation
 	readable(fixContrast(broken), "fixed");
 	assert.equal(fixContrast(PRESETS[0]).dark.fg, PRESETS[0].dark.fg, "colours that already read are left alone");
 	assert.equal(autoAccent2(nord.dark), themeTokens(nord).dark["--studio-accent-2"], "the editor shows the same automatic second accent the app uses");
+});
+
+test("restarting after an update: same command line, handed over in place, only when idle for automatic updates", async () => {
+	const bin = "C:\\npx\\node_modules\\@deepseek-ai\\dsh\\lib\\bin.js";
+	assert.deepEqual(relaunchArgs(["node", bin, "web", "--port", "3080"], []), [bin, "web", "--port", "3080", "--no-open"], "no second browser tab");
+	assert.deepEqual(relaunchArgs(["node", "/x/@deepseek-ai/dsh/lib/bin.js", "web", "--no-open"], ["--inspect"]), ["--inspect", "/x/@deepseek-ai/dsh/lib/bin.js", "web", "--no-open"]);
+	assert.equal(relaunchArgs(["node", "/x/test/selftest.mjs"]), null, "not started by dsh: no restart");
+	assert.equal(relaunchArgs(["node", bin, "plugin", "add", "x"]), null);
+
+	// The shutdown's process.exit() starts the new harness instead, retries a busy port, then exits with the child's code.
+	const exits = [];
+	const children = [];
+	const proc = { exit: (code) => exits.push(code), execPath: "node", cwd: () => "/w", env: { A: "1" } };
+	const spawnFn = (cmd, args, opts) => {
+		const child = Object.assign(new EventEmitter(), { pid: 100 + children.length, cmd, args, opts });
+		children.push(child);
+		return child;
+	};
+	exitIntoChild(["bin.js", "web"], { proc, spawnFn, retryMs: 5, startDelayMs: 5 });
+	proc.exit(0);
+	proc.exit(130); // a second exit while handing over changes nothing
+	await new Promise((r) => setTimeout(r, 30));
+	assert.equal(children.length, 1);
+	assert.deepEqual([children[0].cmd, children[0].args, children[0].opts.stdio, children[0].opts.cwd], ["node", ["bin.js", "web"], "inherit", "/w"]);
+	children[0].emit("exit", 1, null); // port still busy
+	await new Promise((r) => setTimeout(r, 30));
+	assert.equal(children.length, 2, "a quick startup failure is retried");
+	assert.deepEqual(exits, []);
+	children[1].emit("exit", 130, null); // later: Ctrl+C
+	assert.deepEqual(exits, [130], "exits with the new harness's code");
+
+	// The updater: an update you start restarts at once; an automatic one waits until no task has run for two checks.
+	const dir = mkdtempSync(join(tmpdir(), "studio-updater-"));
+	try {
+		const make = (busy) => {
+			const calls = { restart: 0 };
+			const updater = new Updater({
+				dataDir: dir, settingsFile: join(dir, "studio.json"), getAuto: () => false, setAuto: () => {},
+				getRestartAfter: () => true, canRestart: () => true, restart: () => { calls.restart++; return true; },
+				isBusy: () => busy.value, restartDelayMs: 5, idleCheckMs: 10,
+			});
+			Object.assign(updater, { repo: "o/r", source: { kind: "github" }, pluginManager: { installBundle: async () => ({ application: "restart-required" }) } });
+			updater.releases = [{ version: "99.0.0", tag: "v99.0.0", name: "v99", notes: "", publishedAt: null, url: null, prerelease: false }];
+			return { updater, calls };
+		};
+		const manual = make({ value: true });
+		manual.updater.install("99.0.0", "manual");
+		await new Promise((r) => setTimeout(r, 40));
+		assert.equal(manual.calls.restart, 1, "manual updates restart right away, even mid-task (you asked for it)");
+		assert.equal(manual.updater.snapshot().restarting, "99.0.0");
+		const busy = { value: true };
+		const auto = make(busy);
+		auto.updater.install("99.0.0", "auto");
+		await new Promise((r) => setTimeout(r, 60));
+		assert.equal(auto.calls.restart, 0, "automatic updates don't restart while a task runs");
+		assert.equal(auto.updater.snapshot().waitingForIdle, true);
+		busy.value = false;
+		await new Promise((r) => setTimeout(r, 60));
+		assert.equal(auto.calls.restart, 1, "...and restart once things are quiet");
+		auto.updater.stopWaiting();
+		const off = make({ value: false });
+		off.updater.getRestartAfter = () => false;
+		off.updater.install("99.0.0", "manual");
+		await new Promise((r) => setTimeout(r, 30));
+		assert.equal(off.calls.restart, 0, "with the setting off, nothing restarts");
+		off.updater.canRestart = () => false;
+		assert.throws(() => off.updater.restartNow(), /restart itself/);
+	} finally {
+		rmSync(dir, { recursive: true, force: true });
+	}
 });
 
 for (const run of pending) await run();
