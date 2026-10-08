@@ -1,6 +1,6 @@
 # Studio for DeepSeek Harness
 
-Themes and personalisation for [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) (DSH): 18 themes, a theme editor that can also build a theme from any picture, a theme per workspace, a community gallery of themes and prompt packs, liquid-glass panels, wallpapers (Bing daily, slideshows and video), fonts, saved looks on a schedule that can follow sunrise and sunset, your Windows accent colour, layout controls and a focus mode, AI modes, task-finished alerts, a usage and cost dashboard with spending alerts, chat export to Markdown and PDF, accessibility options, smarter saved prompts, settings sync, a Ctrl+K quick switcher, and 19 languages.
+Themes and personalisation for [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) (DSH): 18 themes, a theme editor that builds themes from a mood, one colour, any word or any picture, a theme per workspace, a community gallery of themes and prompt packs, liquid-glass panels, wallpapers (Bing daily, slideshows and video), fonts, saved looks on a schedule that can follow sunrise and sunset, your Windows accent colour, layout controls and a focus mode, AI modes, task-finished alerts, a usage and cost dashboard with spending alerts, chat export to Markdown and PDF, accessibility options, smarter saved prompts, settings sync, a Ctrl+K quick switcher, and 19 languages.
 
 Zero npm dependencies. Your settings stay on your machine unless you turn on sync.
 
@@ -8,7 +8,7 @@ Zero npm dependencies. Your settings stay on your machine unless you turn on syn
 
 | Liquid glass + personal greeting | Quick switcher (live preview) | Theme editor |
 | --- | --- | --- |
-| ![Frosted-glass composer over a wallpaper, greeting "Good night, RdotA"](docs/screenshots/greeting.jpg) | ![Ctrl+K quick switcher previewing Tokyo Night](docs/screenshots/quick-switcher.jpg) | ![Theme editor](docs/screenshots/theme-editor.jpg) |
+| ![Frosted-glass composer over a wallpaper, greeting "Good night, RdotA"](docs/screenshots/greeting.jpg) | ![Ctrl+K quick switcher previewing Tokyo Night](docs/screenshots/quick-switcher.jpg) | ![Theme editor: moods, one colour, any word, with the Cyber mood previewed across the app](docs/screenshots/theme-editor.jpg) |
 
 | Community gallery | Usage & cost (sample data) | Looks & schedule, in Japanese |
 | --- | --- | --- |
@@ -50,7 +50,8 @@ To remove it, use **Uninstall** on its Plugins page entry.
 | --- | --- |
 | **18 themes** | Liquid Glass, Midnight, Dracula, Nord, Tokyo Night, Catppuccin, Rosé Pine, Gruvbox, Solarized, Forest, Ocean, Synthwave, Sakura, Arc Reactor, Espresso, Paper, AMOLED and High Contrast, plus the stock look. Each has a light and a dark version, so DSH's Light / Dark / System switch keeps working. |
 | **Theme per workspace** | Give any workspace its own theme or look, so you can tell your projects apart at a glance. It switches as you move between workspaces and goes back to your usual theme everywhere else. |
-| **Theme editor** | Pick a background, text and accent colour per mode. Studio derives every surface, border, button and text shade from them in OKLCH, with contrast floors so secondary text stays readable. Live contrast badges, whole-app preview while editing, 🎲 randomise, and shareable `dshs1:` theme codes. |
+| **Theme editor** | Pick a background, text and accent colour per mode, plus an optional second accent for gradients. Studio derives every surface, border, button and text shade from them in OKLCH, with contrast floors so secondary text stays readable. Live contrast badges with one-click **Fix**, a screen colour picker 💧, any CSS colour (`rgb(…)`, `hsl(…)`, `tomato`), **undo/redo** (Ctrl+Z / Ctrl+Y), **Make Light from Dark** (and back), a colour-blindness preview, whole-app preview while editing, shareable `dshs1:` codes and `.json` theme files. |
+| **Make a theme** | Twelve **moods** (Calm, Cozy, Cyber, Sunset…, a new take every click), **one colour** with a colour-harmony rule (monochrome, analogous, complementary, split, triadic), **any word** (the same word always makes the same theme), or 🎲 Surprise me. **Lock** 🔒 the colours you like and generators keep them. **Fine-tune** sliders move the whole theme (hue, vividness, warmth, background), and **Variations** offers eight ready-made twists. Text always stays readable. |
 | **Theme from an image** | Build a theme from your desktop wallpaper, your Studio wallpaper or any picture: Studio clusters its colours, picks a background tint and accents, and fits them for contrast in both modes. |
 | **Community gallery** | **Studio → Gallery** lists themes and prompt packs shared by other users; one click adds a theme or a whole pack of prompts. **Submit to the gallery** in the theme editor, or on a prompt folder, opens GitHub with your file ready to propose. See [gallery/](gallery/). |
 | **Looks & schedule** | Save your theme, style and wallpaper together as a named look, then switch whole setups in one click, or on a schedule: at a set time, or at **sunrise** and **sunset** where you are (e.g. a light theme at sunrise, Liquid Glass at sunset). Changing things yourself sticks until the next switch. |
@@ -146,7 +147,7 @@ All routes are behind DSH's own browser authentication.
 git clone https://github.com/IRdotAI/dsh-studio
 cd dsh-studio
 node scripts/build.mjs           # rebuild lib/client.js
-node test/selftest.mjs           # 39 checks
+node test/selftest.mjs           # 40 checks
 node scripts/check-locales.mjs   # every language has every string
 node scripts/build-gallery.mjs   # validate gallery themes and prompt packs, rebuild gallery/index.json
 npx @deepseek-ai/dsh plugin --profile web add "$PWD"   # install your local copy

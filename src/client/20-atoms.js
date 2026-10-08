@@ -177,10 +177,15 @@ function ThemeCard({ choice, active, onPick, footer }) {
 	);
 }
 
-function ContrastBadge({ fg, bg, min, label }) {
+/** A contrast ratio, green when it meets `min`; with `onFix`, a failing badge becomes a one-click fix. */
+function ContrastBadge({ fg, bg, min, label, onFix }) {
 	const ratio = contrast(fg, bg);
-	return h("span", { className: cls("st_badge", ratio >= min ? "st_badge_ok" : "st_badge_warn"), title: t("editor.contrastTitle", { label, ratio: ratio.toFixed(2), min }) },
-		`${ratio.toFixed(1)}:1`);
+	const title = t("editor.contrastTitle", { label, ratio: ratio.toFixed(2), min });
+	if (ratio < min && onFix) {
+		return h("button", { type: "button", className: "st_badge st_badge_warn st_badgeBtn", title: title + " " + t("editor.fixTitle"), onClick: onFix },
+			`${ratio.toFixed(1)}:1 · ${t("editor.fix")}`);
+	}
+	return h("span", { className: cls("st_badge", ratio >= min ? "st_badge_ok" : "st_badge_warn"), title }, `${ratio.toFixed(1)}:1`);
 }
 
 function initialsOf(name) {

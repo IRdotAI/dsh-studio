@@ -30,6 +30,9 @@ Every theme and prompt pack in the [community gallery](gallery/) carries its aut
 
 ## Other sources
 
+- The theme editor's colour-blindness preview uses the colour-vision simulation matrices of Machado, Oliveira and Fernandes (2009), "A Physiologically-based Model for Simulation of Color Vision Deficiency".
+- The moods, colour harmonies and variations in the theme editor are by RdotA.
+
 - **Bing daily** wallpapers are Microsoft Bing's picture of the day; each picture's own copyright line is shown under the wallpaper setting.
 - Sunrise and sunset times use the NOAA solar calculation (public domain).
 - The easy-reading font option uses OpenDyslexic, Atkinson Hyperlegible (Braille Institute) or Lexend when you have one of them installed; Studio doesn't ship any font files.

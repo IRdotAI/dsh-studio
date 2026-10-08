@@ -9,7 +9,9 @@ import {
 	extractPalette, themeFromPalette, withAccent, scheduleSlot, promptPlaceholders, fillPrompt, usageSummary,
 	matchLanguage, cleanGalleryTheme, LANGUAGES, STOCK_THEME,
 	sunTimes, resolveEntryTime, budgetStatus, applyTargetToState, transcriptFromEvents, transcriptToMarkdown, markdownToHtml,
-	cleanGalleryPack, StudioError, hostMessage, wallpaperUrl, slideIndex, workspaceTarget } from "../lib/shared.js";
+	cleanGalleryPack, StudioError, hostMessage, wallpaperUrl, slideIndex, workspaceTarget,
+	EDITOR_MINIMUMS, MOODS, HARMONIES, themeFromColor, themeFromMood, themeFromWord, adjustTheme, mirrorMode, fixContrast,
+	themeVariations, swapAccents, seededRandom, autoAccent2 } from "../lib/shared.js";
 import { UsageLog } from "../lib/usage.js";
 import { GistSync } from "../lib/sync.js";
 import { checkLocales } from "../scripts/check-locales.mjs";
@@ -575,6 +577,49 @@ test("host messages carry translatable codes, nested reasons and English fallbac
 	assert.deepEqual(hostMessage(new Error("boom")), { code: "raw", params: { text: "boom" }, text: "boom" });
 	assert.equal(hostMessage(Object.assign(new Error("x"), { name: "AbortError" })).code, "timeout");
 	assert.equal(hostMessage(msg), msg, "already a message");
+});
+
+test("theme editor tools: moods, one colour, words, fine-tune, mirror, variations, fixes", () => {
+	const readable = (theme, label) => {
+		for (const mode of ["dark", "light"]) {
+			const m = theme[mode];
+			assert.ok(contrast(m.fg, m.bg) >= EDITOR_MINIMUMS.fg, `${label} ${mode}: text ${contrast(m.fg, m.bg).toFixed(2)}`);
+			assert.ok(contrast(m.accent, m.bg) >= EDITOR_MINIMUMS.accent, `${label} ${mode}: accent`);
+			assert.ok(contrast(m.accent2 ?? autoAccent2(m), m.bg) >= 1, `${label} ${mode}: accent2 exists`);
+			if (m.accent2) assert.ok(contrast(m.accent2, m.bg) >= EDITOR_MINIMUMS.accent2, `${label} ${mode}: accent2`);
+			assert.ok(sanitizeState({ customThemes: [{ id: "t", name: "t", ...theme }] }).customThemes.length === 1, `${label}: saves`);
+		}
+		assert.ok(hexToOklch(theme.dark.bg).l < hexToOklch(theme.dark.fg).l && hexToOklch(theme.light.bg).l > hexToOklch(theme.light.fg).l, `${label}: modes the right way round`);
+	};
+	const rand = seededRandom(7);
+	for (const mood of MOODS) for (let i = 0; i < 25; i++) readable(themeFromMood(mood.id, mood.id, rand), "mood " + mood.id);
+	assert.notDeepEqual(themeFromMood("calm", "Calm", seededRandom(1)).dark, themeFromMood("calm", "Calm", seededRandom(2)).dark, "each click is a new take");
+	for (let i = 0; i < 120; i++) {
+		const hex = oklchToHex({ l: rand(), c: rand() * 0.3, h: rand() * 360 });
+		for (const h of HARMONIES) readable(themeFromColor(hex, h.id), `colour ${hex} ${h.id}`);
+	}
+	const purple = themeFromColor("#680081", "complementary");
+	assert.equal(purple.light.accent, "#680081", "the picked colour is used as is where it reads well");
+	assert.ok(Math.abs(hexToOklch(purple.dark.accent).h - hexToOklch("#680081").h) < 12, "and keeps its hue where it has to be lightened");
+	assert.deepEqual([themeFromWord("RdotA").dark, themeFromWord("RdotA").light], [themeFromWord(" rdota ").dark, themeFromWord(" rdota ").light], "a word always makes the same colours");
+	assert.equal(themeFromWord("midnight tokyo").name, "Midnight tokyo");
+	for (const p of PRESETS) {
+		readable(adjustTheme(p), "identity " + p.id);
+		for (const v of themeVariations(p)) readable(v.theme, `variation ${p.id} ${v.id}`);
+		readable(mirrorMode(p, "dark"), "mirror " + p.id);
+		readable(mirrorMode(p, "light"), "mirror back " + p.id);
+		readable(adjustTheme(p, { hue: 120, vivid: 2, warmth: 1, depth: -1 }), "extreme " + p.id);
+		readable(adjustTheme(p, { hue: -120, vivid: 0, warmth: -1, depth: 1 }), "other extreme " + p.id);
+	}
+	const nord = PRESETS.find((p) => p.id === "nord");
+	assert.deepEqual(adjustTheme(nord, { hue: 0 }).dark, { ...nord.dark }, "no adjustment, no change");
+	assert.notEqual(adjustTheme(nord, { hue: 90 }).dark.accent, nord.dark.accent);
+	const swapped = swapAccents(PRESETS[0]);
+	assert.equal(swapped.dark.accent2, PRESETS[0].dark.accent, "accents swap places");
+	const broken = { name: "x", dark: { bg: "#000000", fg: "#222222", accent: "#111111" }, light: { bg: "#ffffff", fg: "#eeeeee", accent: "#fafafa", accent2: "#ffffee" } };
+	readable(fixContrast(broken), "fixed");
+	assert.equal(fixContrast(PRESETS[0]).dark.fg, PRESETS[0].dark.fg, "colours that already read are left alone");
+	assert.equal(autoAccent2(nord.dark), themeTokens(nord).dark["--studio-accent-2"], "the editor shows the same automatic second accent the app uses");
 });
 
 for (const run of pending) await run();

@@ -29,7 +29,8 @@ Add one file to `gallery/themes/`, named after the theme's `id`:
 ```
 
 - `id`: lowercase letters, numbers and dashes. The file is `<id>.json`.
-- `dark` and `light`: three colours each. Studio derives every surface, border and text shade from them.
+- `dark` and `light`: three colours each. Studio derives every surface, border and text shade from them. An optional fourth, `accent2`, sets the second colour used in gradients (otherwise Studio picks one next to the accent).
+- **Download file** in the theme editor saves your theme in exactly this format.
 - Text needs at least **7:1** contrast against the background, and the accent at least **3:1**. The editor shows both ratios as you pick colours.
 
 Check it locally with `node scripts/build-gallery.mjs --check`.
